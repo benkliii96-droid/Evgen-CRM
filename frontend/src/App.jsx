@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Router, useLocation } from './router';
+import { Router, useLocation, Link } from './router';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
 import { ProductTable } from './components/ProductTable';
@@ -12,6 +12,7 @@ import { ConfirmModal } from './components/ConfirmModal';
 import { LoginModal } from './components/LoginModal';
 import { ProductRequestModal } from './components/ProductRequestModal';
 import { CategoryRequestModal } from './components/CategoryRequestModal';
+import { ProductDetail } from './components/ProductDetail';
 import { AdminLayout, AdminDashboard } from './components/AdminLayout';
 import { AdminUsers } from './components/AdminUsers';
 import { AdminProducts } from './components/AdminProducts';
@@ -120,7 +121,7 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
           >
             <option value="">Все категории</option>
             {categories.map(cat => (
-              <option key={cat.id} value={cat.name}>{cat.name}</option>
+              <option key={cat.id} value={cat.name}>{cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>
             ))}
           </select>
           {user && (
@@ -148,10 +149,14 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {visibleProducts.map(product => (
-              <div key={product.id} className="bg-white dark:bg-[#25213b] rounded-2xl overflow-hidden shadow-sm border border-[#e8e4ff] dark:border-[#3d3860]">
-                <div className="h-48 bg-[#f8f7ff] dark:bg-[#2d2847] flex items-center justify-center">
+              <Link 
+                to={`/product/${product.id}/`} 
+                key={product.id} 
+                className="bg-white dark:bg-[#25213b] rounded-2xl overflow-hidden shadow-sm border border-[#e8e4ff] dark:border-[#3d3860] hover:shadow-md hover:border-[#6d5bd0] dark:hover:border-[#6d5bd0] transition-all cursor-pointer group"
+              >
+                <div className="h-48 bg-[#f8f7ff] dark:bg-[#2d2847] flex items-center justify-center overflow-hidden">
                   {product.image ? (
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   ) : (
                     <img src="/nothas_image.svg" alt="Нет изображения" className="w-16 h-16 opacity-50" />
                   )}
@@ -182,7 +187,7 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
                     В наличии: {product.quantity} {product.unit}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
@@ -714,6 +719,11 @@ function AdminPages() {
 
 function App() {
   const location = useLocation();
+  
+  // Страница товара
+  if (location.startsWith('/product/')) {
+    return <ProductDetail />;
+  }
   
   if (location === '/admin/' || location === '/admin' || 
       location.startsWith('/admin/users') || 

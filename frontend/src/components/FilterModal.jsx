@@ -41,7 +41,7 @@ export function FilterModal({ filters, categories, minPrice, maxPrice, onClose, 
               >
                 <option value="">Все категории</option>
                 {categories?.map(cat => (
-                  <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  <option key={cat.id} value={cat.name}>{cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>
                 ))}
               </select>
             </div>

@@ -25,6 +25,10 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
         discountPercent: product.discount_percent || 0,
         description: product.description || ''
       });
+      // Загружаем существующее изображение как превью при редактировании
+      if (product.image) {
+        setImagePreview(product.image);
+      }
     } else {
       setFormData({
         name: '',
@@ -36,6 +40,7 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
         discountPercent: 0,
         description: ''
       });
+      setImagePreview(null);
     }
   }, [product, categories]);
 
@@ -274,11 +279,16 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
                     <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                   </label>
                   {(imagePreview || product?.image) && (
-                    <img 
-                      src={imagePreview || product.image} 
-                      alt="Preview" 
-                      className="w-12 h-12 rounded-lg object-cover border border-[#e8e4ff] dark:border-[#3d3860]" 
-                    />
+                    <div className="relative group">
+                      <img 
+                        src={imagePreview || product.image} 
+                        alt="Preview" 
+                        className="w-24 h-24 rounded-xl object-cover border-2 border-[#6d5bd0] shadow-md" 
+                      />
+                      <div className="absolute inset-0 bg-black/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-xs font-['Inter']">Превью</span>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>

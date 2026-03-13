@@ -54,7 +54,10 @@ def login_view(request):
     user = authenticate(username=username, password=password)
     
     if user:
-        token = user.generate_token()
+        # Используем существующий токен или создаем новый
+        token = user.auth_token
+        if not token:
+            token = user.generate_token()
         return Response({
             'user': UserSerializer(user).data,
             'token': token,

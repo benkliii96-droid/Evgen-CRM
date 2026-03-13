@@ -3,6 +3,21 @@ from .models import Category, Product
 from django.conf import settings
 
 
+# Фильтр нецензурной речи
+BAD_WORDS = ['бля', 'пизда', 'еба', 'хуй', 'нахуй', 'ебать', 'пиздец', 'сука', 'блядь', 'хуйня', 'пизд', 'ебал', 'еби', 'хуя', 'пздц', 'fuck', 'shit', 'ass', 'bitch']
+
+
+def filter_bad_words(text):
+    if not text:
+        return text
+    filtered = text
+    for word in BAD_WORDS:
+        import re
+        regex = re.compile(word, re.IGNORECASE)
+        filtered = regex.sub('*' * len(word), filtered)
+    return filtered
+
+
 class CategorySerializer(serializers.ModelSerializer):
     products_count = serializers.SerializerMethodField()
     
@@ -46,6 +61,12 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             'name', 'category', 'unit', 'quantity', 'price',
             'has_discount', 'discount_percent', 'description', 'image'
         ]
+
+    def validate_name(self, value):
+        return filter_bad_words(value)
+
+    def validate_description(self, value):
+        return filter_bad_words(value)
 
     def to_internal_value(self, data):
         # Преобразуем данные из FormData (все значения - строки)
