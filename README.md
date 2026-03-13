@@ -5,7 +5,6 @@
 ## Структура проекта
 
 ```
-cms/
 ├── backend/                 # Django REST API
 │   ├── config/              # Настройки Django
 │   ├── users/               # Приложение пользователей
