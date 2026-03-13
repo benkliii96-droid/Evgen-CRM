@@ -13,6 +13,7 @@ export function ProductRequestModal({ categories, onClose }) {
     discountPercent: 0,
     description: ''
   });
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -51,6 +52,13 @@ export function ProductRequestModal({ categories, onClose }) {
         setErrors({ ...errors, image: 'Максимальный размер 1МБ' });
         return;
       }
+      // Создаем превью
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setImagePreview(ev.target.result);
+      };
+      reader.readAsDataURL(file);
+      
       setFormData(prev => ({ ...prev, image: file }));
       if (errors.image) {
         setErrors({ ...errors, image: null });
@@ -347,6 +355,25 @@ export function ProductRequestModal({ categories, onClose }) {
                   <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
                 {errors.image && <p className="text-red-500 text-xs">{errors.image}</p>}
+                {imagePreview && (
+                  <div className="relative">
+                    <img 
+                      src={imagePreview} 
+                      alt="Превью" 
+                      className="w-16 h-16 rounded-xl object-cover border-2 border-[#6d5bd0]" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagePreview(null);
+                        setFormData(prev => ({ ...prev, image: null }));
+                      }}
+                      className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
