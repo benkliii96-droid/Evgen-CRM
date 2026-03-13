@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <title>CMS - Система управления товарами</title>
+    
+    <meta name="description" content="CMS - современная система управления товарами. Добавление, редактирование, фильтрация и поиск товаров с поддержкой тёмной темы.">
+    <meta name="keywords" content="CMS, управление товарами, каталог, склад, инвентарь">
+    <meta name="author" content="EvgenCms">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CMS - Система управления товарами">
+    <meta property="og:description" content="Современная система управления товарами с поддержкой тёмной темы, фильтрацией и поиском.">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="EvgenCms">
+    <meta property="og:locale" content="ru_RU">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="CMS - Система управления товарами">
+    <meta name="twitter:description" content="Современная система управления товарами с поддержкой тёмной темы.">
+    
+    <link rel="icon" type="image/svg+xml" href="/Key.svg">
+    <link rel="apple-touch-icon" href="/Key.svg">
+    
+    <script>
+      (function() {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-D1tUAZni.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DftXtQeH.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
