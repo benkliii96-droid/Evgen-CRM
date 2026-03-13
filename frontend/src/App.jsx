@@ -70,38 +70,38 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
   return (
     <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] transition-colors">
       <header className="bg-white dark:bg-[#25213b] shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="font-['Inter'] font-bold text-[24px] text-[#25213b] dark:text-white">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
+          <h1 className="font-['Inter'] font-bold text-[18px] sm:text-[20px] md:text-[24px] text-[#25213b] dark:text-white whitespace-nowrap">
             Каталог товаров
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             {user ? (
               <>
-                <span className="font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">{user.username}</span>
+                <span className="hidden sm:inline font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">{user.username}</span>
                 <button
                   onClick={() => setShowNotifications(true)}
-                  className="relative w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
                 >
-                  <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 dark:brightness-200" />
+                  <img src="/bell.svg" alt="Уведомления" className="w-4 h-4 sm:w-5 sm:h-5 dark:brightness-200" />
                 </button>
                 <button
                   onClick={() => setDarkMode(!darkMode)}
-                  className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
                 >
-                  <img src={darkMode ? '/sun.svg' : '/moon.svg'} alt="Тема" className="w-5 h-5" />
+                  <img src={darkMode ? '/sun.svg' : '/moon.svg'} alt="Тема" className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <button
                   onClick={onLogout}
-                  className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d]"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d]"
                   title="Выйти"
                 >
-                  <img src="/logout.svg" alt="Выйти" className="w-5 h-5 dark:brightness-200" />
+                  <img src="/logout.svg" alt="Выйти" className="w-4 h-4 sm:w-5 sm:h-5 dark:brightness-200" />
                 </button>
               </>
             ) : (
               <button
                 onClick={onLoginClick}
-                className="bg-[#6d5bd0] px-5 py-2 rounded-xl font-['Inter'] font-semibold text-[14px] text-white hover:bg-[#5d4bc0]"
+                className="bg-[#6d5bd0] px-3 sm:px-5 py-2 rounded-xl font-['Inter'] font-semibold text-[13px] sm:text-[14px] text-white hover:bg-[#5d4bc0]"
               >
                 Войти
               </button>
@@ -110,43 +110,43 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex flex-wrap gap-4 mb-6">
-          <div className="relative flex-1 min-w-[200px] max-w-[400px]">
-            <img src="/Search.svg" alt="Поиск" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6e6893]" />
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="relative flex-1 min-w-0">
+            <img src="/Search.svg" alt="Поиск" className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#6e6893]" />
             <input
               type="text"
               placeholder="Поиск..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white dark:bg-[#25213b] h-12 rounded-xl pl-12 pr-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+              className="w-full bg-white dark:bg-[#25213b] h-11 sm:h-12 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
             />
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-white dark:bg-[#25213b] h-12 rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+            className="bg-white dark:bg-[#25213b] h-11 sm:h-12 rounded-xl px-3 sm:px-4 font-['Inter'] text-[13px] sm:text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0] min-w-[140px]"
           >
-            <option value="">Все категории</option>
+            <option value="">Все</option>
             {categories.map(cat => (
               <option key={cat.id} value={cat.name}>{cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>
             ))}
           </select>
           {user && (
-            <>
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => setShowProductRequest(true)}
-                className="bg-[#6d5bd0] h-12 px-5 rounded-xl font-['Inter'] font-medium text-[14px] text-white hover:bg-[#5d4bc0]"
+                className="bg-[#6d5bd0] h-11 sm:h-12 px-3 sm:px-5 rounded-xl font-['Inter'] font-medium text-[12px] sm:text-[14px] text-white hover:bg-[#5d4bc0] whitespace-nowrap"
               >
-                Предложить товар
+                + Товар
               </button>
               <button
                 onClick={() => setShowCategoryRequest(true)}
-                className="bg-white dark:bg-[#25213b] h-12 px-5 rounded-xl font-['Inter'] font-medium text-[14px] text-[#6d5bd0] border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847]"
+                className="bg-white dark:bg-[#25213b] h-11 sm:h-12 px-3 sm:px-5 rounded-xl font-['Inter'] font-medium text-[12px] sm:text-[14px] text-[#6d5bd0] border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] whitespace-nowrap"
               >
-                Предложить категорию
+                + Категория
               </button>
-            </>
+            </div>
           )}
         </div>
 
