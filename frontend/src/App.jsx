@@ -13,6 +13,7 @@ import { LoginModal } from './components/LoginModal';
 import { ProductRequestModal } from './components/ProductRequestModal';
 import { CategoryRequestModal } from './components/CategoryRequestModal';
 import { ProductDetail } from './components/ProductDetail';
+import { NotificationsPanel } from './components/NotificationsPanel';
 import { AdminLayout, AdminDashboard } from './components/AdminLayout';
 import { AdminUsers } from './components/AdminUsers';
 import { AdminProducts } from './components/AdminProducts';
@@ -25,6 +26,7 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showCategoryRequest, setShowCategoryRequest] = useState(false);
   const [showProductRequest, setShowProductRequest] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
   const loaderRef = useRef(null);
 
@@ -76,6 +78,12 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
             {user ? (
               <>
                 <span className="font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">{user.username}</span>
+                <button
+                  onClick={() => setShowNotifications(true)}
+                  className="relative w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
+                >
+                  <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 dark:brightness-200" />
+                </button>
                 <button
                   onClick={() => setDarkMode(!darkMode)}
                   className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
@@ -220,6 +228,14 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
           onClose={() => setShowProductRequest(false)} 
         />
       )}
+
+      {showNotifications && (
+        <NotificationsPanel 
+          darkMode={darkMode}
+          onClose={() => setShowNotifications(false)}
+          user={user}
+        />
+      )}
     </div>
   );
 }
@@ -253,6 +269,7 @@ function AdminPage() {
   const [selectedImage, setSelectedImage] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const [filters, setFilters] = useState({ category: '', priceMin: '', priceMax: '', hasDiscount: '' });
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -540,6 +557,7 @@ function AdminPage() {
         setDarkMode={setDarkMode}
         user={user}
         onLogout={handleLogout}
+        onNotificationsClick={() => setShowNotifications(true)}
       />
       
       <div className="h-[2px] bg-[#6d5bd0] mb-3 sm:mb-4 md:mb-6"></div>
@@ -611,6 +629,14 @@ function AdminPage() {
         <LoginModal
           onClose={() => setIsLoginModalOpen(false)}
           onLogin={handleLogin}
+        />
+      )}
+
+      {showNotifications && (
+        <NotificationsPanel 
+          darkMode={darkMode}
+          onClose={() => setShowNotifications(false)}
+          user={user}
         />
       )}
     </div>

@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'products',
     'requests',
     'admin_panel',
+    'notifications',
 ]
 
 MIDDLEWARE = [

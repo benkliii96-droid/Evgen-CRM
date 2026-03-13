@@ -336,15 +336,6 @@ export function ProductDetail() {
             >
               <img src={darkMode ? '/sun.svg' : '/moon.svg'} alt="Тема" className="w-5 h-5" />
             </button>
-            {user && (
-              <Link
-                to="/admin/"
-                className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
-                title="Админ-панель"
-              >
-                <img src="/settings.svg" alt="Настройки" className="w-5 h-5 dark:brightness-200" />
-              </Link>
-            )}
           </div>
         </div>
       </header>

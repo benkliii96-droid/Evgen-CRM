@@ -8,6 +8,11 @@ from .serializers import (
     CategoryRequestSerializer, CategoryRequestCreateSerializer, CategoryRequestReviewSerializer
 )
 from users.authentication import TokenAuthentication
+from notifications.utils import (
+    notify_product_approved, notify_product_rejected,
+    notify_category_approved, notify_category_rejected,
+    notify_new_request
+)
 
 
 class IsAdminUser(permissions.BasePermission):
@@ -34,8 +39,15 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         return ProductRequestSerializer
     
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-    
+        request_obj = serializer.save(user=self.request.user)
+        # Уведомляем админов о новом запросе
+        notify_new_request(
+            admin_user=None,
+            request_type='товар',
+            request_name=request_obj.name,
+            request_id=request_obj.id
+        )
+        
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'destroy']:
             return [IsAdminUser()]
@@ -66,6 +78,9 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         product_request.status = 'approved'
         product_request.save()
         
+        # Отправляем уведомление пользователю
+        notify_product_approved(product_request)
+        
         return Response({'status': 'approved'})
     
     @action(detail=True, methods=['post'])
@@ -81,6 +96,9 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         product_request.status = 'rejected'
         product_request.admin_comment = request.data.get('comment', '')
         product_request.save()
+        
+        # Отправляем уведомление пользователю
+        notify_product_rejected(product_request)
         
         return Response({'status': 'rejected'})
 
@@ -104,7 +122,14 @@ class CategoryRequestViewSet(viewsets.ModelViewSet):
         return CategoryRequestSerializer
     
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        request_obj = serializer.save(user=self.request.user)
+        # Уведомляем админов о новом запросе
+        notify_new_request(
+            admin_user=None,
+            request_type='категорию',
+            request_name=request_obj.name,
+            request_id=request_obj.id
+        )
     
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'destroy']:
@@ -126,6 +151,9 @@ class CategoryRequestViewSet(viewsets.ModelViewSet):
         category_request.status = 'approved'
         category_request.save()
         
+        # Отправляем уведомление пользователю
+        notify_category_approved(category_request)
+        
         return Response({'status': 'approved'})
     
     @action(detail=True, methods=['post'])
@@ -141,5 +169,8 @@ class CategoryRequestViewSet(viewsets.ModelViewSet):
         category_request.status = 'rejected'
         category_request.admin_comment = request.data.get('comment', '')
         category_request.save()
+        
+        # Отправляем уведомление пользователю
+        notify_category_rejected(category_request)
         
         return Response({'status': 'rejected'})

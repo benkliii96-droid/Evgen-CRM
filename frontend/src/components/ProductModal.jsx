@@ -68,11 +68,16 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
         return;
       }
       const reader = new FileReader();
-      reader.onload = (ev) => setImagePreview(ev.target.result);
+      reader.onload = (ev) => {
+        setImagePreview(ev.target.result);
+      };
       reader.readAsDataURL(file);
       setFormData(prev => ({ ...prev, image: file }));
     }
   };
+
+  // Показать превью - сначала загруженное, потом из продукта
+  const showPreview = imagePreview || (product?.image);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -278,10 +283,10 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
                     <span className="font-['Inter'] text-[13px] text-[#6e6893]">Выбрать</span>
                     <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                   </label>
-                  {(imagePreview || product?.image) && (
+                  {showPreview && (
                     <div className="relative group">
                       <img 
-                        src={imagePreview || product.image} 
+                        src={imagePreview || product?.image} 
                         alt="Preview" 
                         className="w-24 h-24 rounded-xl object-cover border-2 border-[#6d5bd0] shadow-md" 
                       />

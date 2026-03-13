@@ -65,6 +65,7 @@ urlpatterns = [
     path('api/auth/', include('users.urls')),
     path('api/', include('products.urls')),
     path('api/requests/', include('requests.urls')),
+    path('api/notifications/', include('notifications.urls')),
     path('', react_serve, name='index'),
     path('<path:path>', react_serve, name='react_app'),
 ]

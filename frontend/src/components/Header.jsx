@@ -1,4 +1,4 @@
-export function Header({ totalCost, darkMode, setDarkMode, user, onLogout }) {
+export function Header({ totalCost, darkMode, setDarkMode, user, onLogout, onNotificationsClick }) {
   const isAdmin = user?.role === 'admin' || user?.is_admin
   
   return (
@@ -15,6 +15,17 @@ export function Header({ totalCost, darkMode, setDarkMode, user, onLogout }) {
             <img src="/Key.svg" alt="Админ" className="w-4 h-4" />
             <span className="hidden sm:inline">Админ</span>
           </a>
+        )}
+        {user && onNotificationsClick && (
+          <button
+            onClick={onNotificationsClick}
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white dark:bg-[#25213b] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860] transition-colors flex-shrink-0"
+            type="button"
+            aria-label="Уведомления"
+            title="Уведомления"
+          >
+            <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 sm:w-6 sm:h-6 dark:brightness-200" />
+          </button>
         )}
         <button
           onClick={() => setDarkMode(!darkMode)}
