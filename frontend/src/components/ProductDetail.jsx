@@ -436,6 +436,27 @@ export function ProductDetail() {
               </div>
             )}
 
+            {/* Dynamic Fields */}
+            {product.field_values && product.field_values.length > 0 && (
+              <div className="mb-6 pb-6 border-b border-[#e8e4ff] dark:border-[#3d3860]">
+                <h3 className="font-['Inter'] font-semibold text-[16px] text-[#25213b] dark:text-white mb-4">
+                  Характеристики
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {product.field_values.map((fv, idx) => (
+                    <div key={idx} className="flex items-center justify-between bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl p-3">
+                      <span className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">
+                        {fv.field?.name || fv.field?.slug}
+                      </span>
+                      <span className="font-['Inter'] text-[14px] text-[#25213b] dark:text-white font-medium">
+                        <FieldValueDisplay value={fv.value} field={fv.field} />
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Info Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {product.user_username && (
@@ -492,4 +513,56 @@ export function ProductDetail() {
       </div>
     </div>
   );
+}
+
+// Компонент для отображения значения поля
+function FieldValueDisplay({ value, field }) {
+  if (value === null || value === undefined) return '—';
+  
+  const fieldType = field?.field_type;
+  
+  switch (fieldType) {
+    case 'boolean':
+      return value ? 'Да' : 'Нет';
+    
+    case 'image':
+      return value ? (
+        <img src={value} alt="" className="w-12 h-12 rounded-lg object-cover" />
+      ) : '—';
+    
+    case 'color':
+      return (
+        <div className="flex items-center gap-2">
+          <div 
+            className="w-5 h-5 rounded border border-[#e8e4ff] dark:border-[#3d3860]" 
+            style={{ backgroundColor: value }}
+          />
+          <span>{value}</span>
+        </div>
+      );
+    
+    case 'multiselect':
+      if (Array.isArray(value)) {
+        return value.join(', ');
+      }
+      return String(value);
+    
+    case 'range':
+      return `${value} ${field?.unit || ''}`.trim();
+    
+    case 'select':
+    case 'text':
+    case 'textarea':
+    case 'number':
+    case 'decimal':
+    case 'date':
+    case 'datetime':
+    case 'email':
+    case 'phone':
+    case 'url':
+      return String(value);
+    
+    default:
+      return String(value);
+  }
 }

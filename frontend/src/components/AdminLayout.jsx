@@ -131,6 +131,18 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
             >
               Запросы
             </Link>
+            <Link
+              to="/admin/categories/"
+              className="block px-4 py-3 rounded-xl font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] transition-colors"
+            >
+              Категории и поля
+            </Link>
+            <Link
+              to="/admin/units/"
+              className="block px-4 py-3 rounded-xl font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] transition-colors"
+            >
+              Единицы измерения
+            </Link>
           </nav>
         </aside>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Router, useLocation, Link } from './router';
+import { Router, useLocation, useNavigate, Link } from './router';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
 import { ProductTable } from './components/ProductTable';
@@ -19,6 +19,8 @@ import { AdminLayout, AdminDashboard } from './components/AdminLayout';
 import { AdminUsers } from './components/AdminUsers';
 import { AdminProducts } from './components/AdminProducts';
 import { AdminRequests } from './components/AdminRequests';
+import { AdminCategories } from './components/AdminCategories';
+import { AdminUnits } from './components/AdminUnits';
 
 const API_URL = ''; // Пустой = относительный URL, работает и для HTTP и для HTTPS
 
@@ -385,6 +387,9 @@ const [unreadCount, setUnreadCount] = useState(0);
 }
 
 function AdminPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -476,12 +481,12 @@ function AdminPage() {
         .then(data => setUser(data))
         .catch(() => {
           localStorage.removeItem('token');
-          window.location.href = '/admin/';
+          navigate('/');
         });
     } else {
-      window.location.href = '/admin/';
+      navigate('/');
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     const token = localStorage.getItem('token');
@@ -492,7 +497,7 @@ function AdminPage() {
       }).catch(() => {});
     }
     localStorage.removeItem('token');
-    window.location.href = '/admin/';
+    navigate('/');
   };
 
   useEffect(() => {
@@ -510,27 +515,35 @@ function AdminPage() {
 
   const isAdmin = user.is_admin || user.role === 'admin';
 
-  const renderPage = () => {
+  // Определяем текущую страницу на основе URL
+  const getCurrentPage = () => {
     if (!isAdmin) {
       return (
         <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] p-6 flex items-center justify-center">
           <div className="text-center">
             <h1 className="font-['Inter'] font-bold text-[28px] text-[#25213b] dark:text-white mb-4">Доступ запрещён</h1>
             <p className="font-['Inter'] text-[#6e6893] dark:text-[#b8b3d4] mb-4">У вас нет прав администратора</p>
-            <a href="/admin/" className="text-[#6d5bd0] hover:underline font-['Inter']">Вернуться</a>
+            <Link to="/" className="text-[#6d5bd0] hover:underline font-['Inter']">Вернуться</Link>
           </div>
         </div>
       );
     }
 
-    if (location === '/admin/' || location === '/admin') {
+    // Убираем /admin/ префикс для сравнения
+    const path = location.replace(/^\/admin/, '') || '/';
+    
+    if (path === '/' || path === '') {
       return <AdminDashboard stats={stats} />;
-    } else if (location === '/admin/users/' || location === '/admin/users') {
+    } else if (path === '/users' || path === '/users/') {
       return <AdminUsers />;
-    } else if (location === '/admin/products/' || location === '/admin/products') {
+    } else if (path === '/products' || path === '/products/') {
       return <AdminProducts />;
-    } else if (location === '/admin/requests/' || location === '/admin/requests') {
+    } else if (path === '/requests' || path === '/requests/') {
       return <AdminRequests />;
+    } else if (path === '/categories' || path === '/categories/') {
+      return <AdminCategories />;
+    } else if (path === '/units' || path === '/units/') {
+      return <AdminUnits />;
     }
     
     return <AdminDashboard stats={stats} />;
@@ -538,7 +551,7 @@ function AdminPage() {
 
   return (
     <AdminLayout user={user} onLogout={handleLogout} darkMode={darkMode} setDarkMode={setDarkMode}>
-      {renderPage()}
+      {getCurrentPage()}
     </AdminLayout>
   );
 }
