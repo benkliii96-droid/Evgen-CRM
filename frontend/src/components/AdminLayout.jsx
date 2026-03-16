@@ -56,9 +56,9 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
                 title="Уведомления"
               >
                 <img 
-                  src={pendingCount > 0 ? "/bell-active.svg" : "/bell.svg"} 
+                  src="/bell.svg" 
                   alt="Уведомления" 
-                  className="w-5 h-5" 
+                  className={`w-5 h-5 transition-all ${pendingCount > 0 ? 'animate-pulse' : ''}`} 
                 />
               </button>
               {pendingCount > 0 && (

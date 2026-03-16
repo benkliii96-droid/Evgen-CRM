@@ -16,8 +16,8 @@ export function AdminRequests() {
     const token = localStorage.getItem('token');
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        fetch(`${API_URL}/api/requests/products/`, { headers: { 'Authorization': `Token ${token}` } }),
-        fetch(`${API_URL}/api/requests/categories/`, { headers: { 'Authorization': `Token ${token}` } })
+fetch(`${API_URL}/api/requests/products/?status=pending`, { headers: { 'Authorization': `Token ${token}` } }),
+fetch(`${API_URL}/api/requests/categories/?status=pending`, { headers: { 'Authorization': `Token ${token}` } })
       ]);
       setProductRequests(await productsRes.json());
       setCategoryRequests(await categoriesRes.json());

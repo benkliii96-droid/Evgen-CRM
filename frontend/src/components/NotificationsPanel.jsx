@@ -352,7 +352,9 @@ export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false })
                       disabled={bulkActionLoading}
                       className="px-3 py-1.5 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white text-xs rounded-lg font-['Inter'] font-medium transition-colors flex items-center gap-1"
                     >
-                      <img src="/check.svg" alt="" className="w-3.5 h-3.5" />
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
                       Одобрить выбранные
                     </button>
                     <button
@@ -360,7 +362,9 @@ export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false })
                       disabled={bulkActionLoading}
                       className="px-3 py-1.5 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs rounded-lg font-['Inter'] font-medium transition-colors flex items-center gap-1"
                     >
-                      <img src="/close.svg" alt="" className="w-3.5 h-3.5" />
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                       Отклонить выбранные
                     </button>
                   </div>
@@ -461,26 +465,42 @@ export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false })
       case 'category_approved':
         return (
           <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <img src="/check.svg" alt="Одобрено" className="w-5 h-5" />
+
+            <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+
           </div>
         );
       case 'product_rejected':
       case 'category_rejected':
         return (
           <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-            <img src="/close.svg" alt="Отклонено" className="w-5 h-5" />
+
+            <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+
           </div>
         );
       case 'new_request':
         return (
           <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-            <img src="/error.svg" alt="Новая заявка" className="w-5 h-5" />
+
+            <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+
           </div>
         );
       default:
         return (
           <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-            <img src="/bell.svg" alt="Уведомление" className="w-5 h-5" />
+
+            <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+
           </div>
         );
     }
