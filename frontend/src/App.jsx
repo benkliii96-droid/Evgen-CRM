@@ -84,7 +84,7 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
                     onClick={() => setShowNotifications(true)}
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
                   >
-                    <img src="/bell.svg" alt="Уведомления" className="w-4 h-4 sm:w-5 sm:h-5 dark:brightness-200" />
+                    <img src="./bell.svg" alt="Уведомления" className="w-4 h-4 sm:w-5 sm:h-5 dark:brightness-200" />
                   </button>
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
@@ -428,30 +428,27 @@ function AdminPage() {
     try {
       // Проверяем есть ли изображение
       const hasImage = formData.get('image') instanceof File;
+      let res;
       
       // Если есть изображение - используем FormData, иначе JSON
       if (hasImage) {
         // Отправляем как FormData с токеном в заголовке
         if (editingProduct) {
-          const res = await fetch(`${API_URL}/api/products/${editingProduct.id}/`, {
+          res = await fetch(`${API_URL}/api/products/${editingProduct.id}/`, {
             method: 'PATCH',
             headers: { 
               'Authorization': `Token ${token}`
             },
             body: formData
           });
-          const updated = await res.json();
-          setProducts(products.map(p => p.id === editingProduct.id ? updated : p));
         } else {
-          const res = await fetch(`${API_URL}/api/products/`, {
+          res = await fetch(`${API_URL}/api/products/`, {
             method: 'POST',
             headers: { 
               'Authorization': `Token ${token}`
             },
             body: formData
           });
-          const created = await res.json();
-          setProducts([...products, created]);
         }
       } else {
         // Отправляем как JSON
@@ -471,7 +468,7 @@ function AdminPage() {
         });
 
         if (editingProduct) {
-          const res = await fetch(`${API_URL}/api/products/${editingProduct.id}/`, {
+          res = await fetch(`${API_URL}/api/products/${editingProduct.id}/`, {
             method: 'PATCH',
             headers: { 
               'Authorization': `Token ${token}`,
@@ -479,10 +476,8 @@ function AdminPage() {
             },
             body: JSON.stringify(data)
           });
-          const updated = await res.json();
-          setProducts(products.map(p => p.id === editingProduct.id ? updated : p));
         } else {
-          const res = await fetch(`${API_URL}/api/products/`, {
+          res = await fetch(`${API_URL}/api/products/`, {
             method: 'POST',
             headers: { 
               'Authorization': `Token ${token}`,
@@ -490,13 +485,29 @@ function AdminPage() {
             },
             body: JSON.stringify(data)
           });
-          const created = await res.json();
-          setProducts([...products, created]);
         }
       }
+
+      // Проверяем статус ответа
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Ошибка сервера:', res.status, errorData);
+        setIsErrorModalOpen(true);
+        return;
+      }
+
+      const data = await res.json();
+      
+      if (editingProduct) {
+        setProducts(products.map(p => p.id === editingProduct.id ? data : p));
+      } else {
+        setProducts([...products, data]);
+      }
+      
       setIsProductModalOpen(false);
       setEditingProduct(null);
-    } catch {
+    } catch (err) {
+      console.error('Ошибка при сохранении:', err);
       setIsErrorModalOpen(true);
     }
   };

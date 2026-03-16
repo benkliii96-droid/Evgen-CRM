@@ -12,7 +12,7 @@ export function Header({ totalCost, darkMode, setDarkMode, user, onLogout, onNot
             href="/admin/"
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#6d5bd0] text-white font-['Inter'] text-[12px] md:text-[13px] font-medium hover:bg-[#5d4bc0] transition-colors"
           >
-            <img src="/Key.svg" alt="Админ" className="w-4 h-4" />
+            <img src="./Key.svg" alt="Админ" className="w-4 h-4" />
             <span className="hidden sm:inline">Админ</span>
           </a>
         )}
@@ -25,7 +25,7 @@ export function Header({ totalCost, darkMode, setDarkMode, user, onLogout, onNot
               aria-label="Уведомления"
               title="Уведомления"
             >
-              <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 sm:w-6 sm:h-6 dark:brightness-200" />
+              <img src="./bell.svg" alt="Уведомления" className="w-5 h-5 sm:w-6 sm:h-6 dark:brightness-200" />
             </button>
             {false && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">

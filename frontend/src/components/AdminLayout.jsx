@@ -24,7 +24,7 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
                 className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
                 title="Уведомления"
               >
-                <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 dark:brightness-200" />
+                <img src="./bell.svg" alt="Уведомления" className="w-5 h-5 dark:brightness-200" />
               </button>
               {false && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
@@ -37,9 +37,9 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
               className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
             >
               {darkMode ? (
-                <img src="/sun.svg" alt="Светлая тема" className="w-5 h-5" />
+                <img src="./sun.svg" alt="Светлая тема" className="w-5 h-5" />
               ) : (
-                <img src="/moon.svg" alt="Тёмная тема" className="w-5 h-5" />
+                <img src="./moon.svg" alt="Тёмная тема" className="w-5 h-5" />
               )}
             </button>
             <span className="font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">{user?.username}</span>
@@ -48,7 +48,7 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
               className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d] transition-colors"
               title="Выйти"
             >
-              <img src="/logout.svg" alt="Выйти" className="w-5 h-5 dark:brightness-200" />
+              <img src="./logout.svg" alt="Выйти" className="w-5 h-5 dark:brightness-200" />
             </button>
           </div>
         </div>

@@ -62,24 +62,21 @@ export function AdminProducts() {
     const token = localStorage.getItem('token');
     try {
       const hasImage = formData.get('image') instanceof File;
+      let res;
       
       if (hasImage) {
         if (editProduct) {
-          const res = await fetch(`${API_URL}/api/products/${editProduct.id}/`, {
+          res = await fetch(`${API_URL}/api/products/${editProduct.id}/`, {
             method: 'PATCH',
             headers: { 'Authorization': `Token ${token}` },
             body: formData
           });
-          const updated = await res.json();
-          setProducts(products.map(p => p.id === editProduct.id ? updated : p));
         } else {
-          const res = await fetch(`${API_URL}/api/products/`, {
+          res = await fetch(`${API_URL}/api/products/`, {
             method: 'POST',
             headers: { 'Authorization': `Token ${token}` },
             body: formData
           });
-          const created = await res.json();
-          setProducts([...products, created]);
         }
       } else {
         const data = {};
@@ -98,7 +95,7 @@ export function AdminProducts() {
         });
 
         if (editProduct) {
-          const res = await fetch(`${API_URL}/api/products/${editProduct.id}/`, {
+          res = await fetch(`${API_URL}/api/products/${editProduct.id}/`, {
             method: 'PATCH',
             headers: { 
               'Authorization': `Token ${token}`,
@@ -106,10 +103,8 @@ export function AdminProducts() {
             },
             body: JSON.stringify(data)
           });
-          const updated = await res.json();
-          setProducts(products.map(p => p.id === editProduct.id ? updated : p));
         } else {
-          const res = await fetch(`${API_URL}/api/products/`, {
+          res = await fetch(`${API_URL}/api/products/`, {
             method: 'POST',
             headers: { 
               'Authorization': `Token ${token}`,
@@ -117,13 +112,29 @@ export function AdminProducts() {
             },
             body: JSON.stringify(data)
           });
-          const created = await res.json();
-          setProducts([...products, created]);
         }
       }
+
+      // Проверяем статус ответа
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Ошибка сервера:', res.status, errorData);
+        setShowError(true);
+        return;
+      }
+
+      const data = await res.json();
+      
+      if (editProduct) {
+        setProducts(products.map(p => p.id === editProduct.id ? data : p));
+      } else {
+        setProducts([...products, data]);
+      }
+      
       setShowModal(false);
       setEditProduct(null);
     } catch (err) {
+      console.error('Ошибка при сохранении:', err);
       setShowError(true);
     }
   };
