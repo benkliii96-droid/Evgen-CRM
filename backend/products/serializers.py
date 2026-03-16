@@ -73,7 +73,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         converted = {}
         for key, value in data.items():
             if key == 'hasDiscount':
-                converted['has_discount'] = value in ('true', 'True', '1', True)
+                converted['has_discount'] = value.lower() in ('true', '1', 'yes')
             elif key == 'category':
                 try:
                     converted['category'] = int(value)
@@ -83,17 +83,23 @@ class ProductCreateSerializer(serializers.ModelSerializer):
                 try:
                     converted['quantity'] = int(value)
                 except (ValueError, TypeError):
-                    converted['quantity'] = value
+                    converted['quantity'] = 0
             elif key == 'discountPercent':
                 try:
                     converted['discount_percent'] = int(value)
                 except (ValueError, TypeError):
-                    converted['discount_percent'] = value
+                    converted['discount_percent'] = 0
             elif key == 'price':
                 try:
                     converted['price'] = float(value)
                 except (ValueError, TypeError):
-                    converted['price'] = value
+                    converted['price'] = 0.0
+            elif key == 'unit':
+                converted['unit'] = value or 'шт'
+            elif key == 'name':
+                converted['name'] = value.strip()
+            elif key == 'description':
+                converted['description'] = value or ''
             else:
                 converted[key] = value
         return super().to_internal_value(converted)
