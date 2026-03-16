@@ -542,7 +542,7 @@ function App() {
       location.startsWith('/admin/users') || 
       location.startsWith('/admin/products') || 
       location.startsWith('/admin/requests')) {
-    return <AdminPages />;
+    return <AdminPage />;
   }
   
   return <MainPageWithAuth />;

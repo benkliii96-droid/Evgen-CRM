@@ -54,7 +54,7 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
     formData.append('avatar', file);
     
     try {
-      const res = await fetch(`${API_URL}/api/users/profile/avatar/`, {
+      const res = await fetch(`${API_URL}/api/auth/profile/avatar/`, {
         method: 'POST',
         headers: { 'Authorization': `Token ${token}` },
         body: formData
@@ -86,7 +86,7 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
     const token = localStorage.getItem('token');
     
     try {
-      const res = await fetch(`${API_URL}/api/users/profile/change-password/`, {
+      const res = await fetch(`${API_URL}/api/auth/profile/change-password/`, {
         method: 'POST',
         headers: { 
           'Authorization': `Token ${token}`,
@@ -124,7 +124,7 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
     const token = localStorage.getItem('token');
     
     try {
-      const res = await fetch(`${API_URL}/api/users/profile/`, {
+      const res = await fetch(`${API_URL}/api/auth/profile/`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Token ${token}`,
