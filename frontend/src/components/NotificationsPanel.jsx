@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 const API_URL = '';
 
 export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false }) {
-  const [notifications, setNotifications] = useState([]);
+const [notifications, setNotifications] = useState([]);
+  const [showUnreadOnly, setShowUnreadOnly] = useState(true);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [productRequests, setProductRequests] = useState([]);
@@ -512,9 +513,19 @@ export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false })
         {/* Header */}
         <div className="p-4 md:p-6 border-b border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white">
-              Уведомления
-            </h2>
+
+            <div className="flex items-center gap-3">
+              <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white">
+                Уведомления
+              </h2>
+              <button
+                onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+                className="px-3 py-1 rounded-lg text-xs font-['Inter'] bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
+              >
+                {showUnreadOnly ? 'Все' : 'Непрочитанные'}
+              </button>
+            </div>
+
             {unreadCount > 0 && (
               <span className="bg-[#6d5bd0] text-white text-xs px-2 py-1 rounded-full font-['Inter'] font-medium">
                 {unreadCount}
@@ -553,7 +564,7 @@ export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false })
             </div>
           ) : (
             <div className="divide-y divide-[#e8e4ff] dark:divide-[#3d3860]">
-              {notifications.map(notif => (
+{notifications.filter(n => !showUnreadOnly || !n.is_read).map(notif => (
                 <div
                   key={notif.id}
                   onClick={() => !notif.is_read && markAsRead(notif.id)}
