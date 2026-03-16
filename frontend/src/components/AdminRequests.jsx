@@ -17,10 +17,12 @@ export function AdminRequests() {
   const fetchRequests = async () => {
     const token = localStorage.getItem('token');
     try {
-      const [productsRes, categoriesRes] = await Promise.all([
-fetch(`${API_URL}/api/requests/products/?status=pending`, { headers: { 'Authorization': `Token ${token}` } }),
-fetch(`${API_URL}/api/requests/categories/?status=pending`, { headers: { 'Authorization': `Token ${token}` } })
+
+        const [productsRes, categoriesRes] = await Promise.all([
+fetch(`${API_URL}/api/requests/products/`, { headers: { 'Authorization': `Token ${token}` } }),
+fetch(`${API_URL}/api/requests/categories/`, { headers: { 'Authorization': `Token ${token}` } })
       ]);
+
       setProductRequests(await productsRes.json());
       setCategoryRequests(await categoriesRes.json());
     } catch (err) {
@@ -150,8 +152,10 @@ fetch(`${API_URL}/api/requests/categories/?status=pending`, { headers: { 'Author
               Нет запросов
             </div>
           ) : (
-            productRequests.map(req => (
+
+            productRequests.filter(req => req.status === 'pending').map(req => (
               <div key={req.id} className="bg-white dark:bg-[#25213b] rounded-xl p-4 border border-[#e8e4ff] dark:border-[#3d3860]">
+
 
                 <div className="flex items-start gap-3">
                   <label className="flex items-center gap-2 cursor-pointer self-start mt-1 flex-shrink-0">
@@ -217,8 +221,10 @@ fetch(`${API_URL}/api/requests/categories/?status=pending`, { headers: { 'Author
               Нет запросов
             </div>
           ) : (
-            categoryRequests.map(req => (
+
+            categoryRequests.filter(req => req.status === 'pending').map(req => (
               <div key={req.id} className="bg-white dark:bg-[#25213b] rounded-xl p-4 border border-[#e8e4ff] dark:border-[#3d3860]">
+
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-['Inter'] font-semibold text-[16px] text-[#25213b] dark:text-white">{req.name}</h3>
