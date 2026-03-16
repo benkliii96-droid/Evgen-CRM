@@ -157,7 +157,9 @@ export function ProductRequestModal({ categories, onClose }) {
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
         <div className="bg-white dark:bg-[#25213b] rounded-2xl w-full max-w-[360px] p-6 text-center">
-          <img src="/check.svg" alt="Успешно" className="w-20 h-20 mx-auto mb-4" />
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-20 h-20 mx-auto mb-4">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
           <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white mb-2">
             Заявка отправлена
           </h2>

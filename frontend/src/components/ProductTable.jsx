@@ -1,12 +1,28 @@
 import { TableRow } from './TableRow';
 
+const SortIcon = ({ direction, active }) => {
+  if (!active) {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 md:w-4 md:h-4 opacity-30">
+        <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+      </svg>
+    );
+  }
+  if (direction === 'asc') {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 md:w-4 md:h-4">
+        <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+      </svg>
+    );
+  }
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 md:w-4 md:h-4">
+      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+    </svg>
+  );
+};
+
 export function ProductTable({ products, sortConfig, onSort, onEdit, onDelete, onImageClick }) {
-  const getSortIcon = (key) => {
-    if (sortConfig.key !== key) {
-      return '/sort.svg';
-    }
-    return sortConfig.direction === 'asc' ? '/sort-asc.svg' : '/sort-desc.svg';
-  };
 
   const columns = [
     { key: 'id', label: 'ID' },
@@ -31,7 +47,7 @@ export function ProductTable({ products, sortConfig, onSort, onEdit, onDelete, o
               >
                 <div className="flex items-center gap-1 md:gap-2">
                   <span>{col.label}</span>
-                  <img src={getSortIcon(col.key)} alt="Сортировка" className="w-3 h-3 md:w-4 md:h-4 opacity-50" />
+                  <SortIcon direction={sortConfig.direction} active={sortConfig.key === col.key} />
                 </div>
               </th>
             ))}

@@ -5,12 +5,16 @@ export function Toolbar({ searchQuery, onSearchChange, onFilterClick, onAddClick
         onClick={onFilterClick}
         className="flex items-center gap-2 px-4 py-3 bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860] transition-all border border-[#e8e4ff] dark:border-[#3d3860]"
       >
-        <img src="/Filter.svg" alt="Фильтр" className="w-5 h-5 dark:brightness-200" />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 dark:brightness-200 text-[#6e6893]">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
         <span className="font-['Inter'] font-semibold text-[12px] md:text-[13px] text-[#6e6893] dark:text-[#b8b3d4] uppercase">Фильтр</span>
       </button>
 
       <div className="relative flex-1 min-w-[200px] max-w-[320px]">
-        <img src="/Search.svg" alt="Поиск" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-60 dark:brightness-200" />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-60 dark:brightness-200 text-[#6e6893]">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
         <input
           type="text"
           placeholder="Поиск..."
