@@ -166,3 +166,14 @@ def profile_view(request):
     
     request.user.save()
     return Response(UserSerializer(request.user).data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_by_id_view(request, user_id):
+    """Получение пользователя по ID"""
+    try:
+        user = User.objects.get(id=user_id)
+        return Response(UserSerializer(user).data)
+    except User.DoesNotExist:
+        return Response({'error': 'Пользователь не найден'}, status=status.HTTP_404_NOT_FOUND)

@@ -3,11 +3,14 @@ import { Link } from '../router';
 
 const API_URL = '';
 
-export function Profile({ darkMode, setDarkMode, user, onLogout }) {
+export function Profile({ darkMode, setDarkMode, user, onLogout, viewUserId }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+  const [userProducts, setUserProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [viewedUser, setViewedUser] = useState(null);
   
   // Смена пароля
   const [currentPassword, setCurrentPassword] = useState('');
@@ -18,11 +21,44 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
   const [username, setUsername] = useState(user?.username || '');
   const [isEditing, setIsEditing] = useState(false);
 
+  const isOwnProfile = !viewUserId || (user && user.id === parseInt(viewUserId));
+
   useEffect(() => {
     if (user?.avatar) {
       setAvatarPreview(user.avatar);
     }
   }, [user]);
+
+  // Загрузка товаров пользователя
+  useEffect(() => {
+    const targetUserId = viewUserId || (user ? user.id : null);
+    if (!targetUserId) return;
+    
+    setProductsLoading(true);
+    fetch(`${API_URL}/api/products/by-user/${targetUserId}/`)
+      .then(res => res.json())
+      .then(data => {
+        setUserProducts(data);
+        // Если это чужой профиль - получим данные пользователя
+        if (viewUserId && viewUserId !== String(user?.id)) {
+          fetch(`${API_URL}/api/auth/user/${viewUserId}/`, {
+            headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
+          })
+            .then(res => res.ok ? res.json() : null)
+            .then(userData => {
+              if (userData) {
+                setViewedUser(userData);
+                if (userData.avatar) {
+                  setAvatarPreview(userData.avatar);
+                }
+              }
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {})
+      .finally(() => setProductsLoading(false));
+  }, [viewUserId, user]);
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
@@ -147,6 +183,8 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
     }
   };
 
+  const displayUser = viewedUser || user;
+  
   return (
     <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] transition-colors">
       {/* Header */}
@@ -161,39 +199,50 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
               <span className="font-['Inter'] text-[14px]">Назад</span>
             </Link>
             <h1 className="font-['Inter'] font-bold text-[20px] md:text-[24px] text-[#25213b] dark:text-white">
-              Личный кабинет
+              {isOwnProfile ? 'Личный кабинет' : `Профиль: ${displayUser?.username || 'Пользователь'}`}
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
-            >
-              {darkMode ? (
-                <img src="/sun.svg" alt="Солнце" className="w-5 h-5" />
-              ) : (
-                <img src="/moon.svg" alt="Луна" className="w-5 h-5" />
-              )}
-            </button>
-            <button
-              onClick={onLogout}
-              className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d]"
-              title="Выйти"
-            >
-              <img src="/logout.svg" alt="Выйти" className="w-5 h-5" />
-            </button>
+            {isOwnProfile && (
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
+              >
+                {darkMode ? (
+                  <img src="/sun.svg" alt="Солнце" className="w-5 h-5" />
+                ) : (
+                  <img src="/moon.svg" alt="Луна" className="w-5 h-5" />
+                )}
+              </button>
+            )}
+            {isOwnProfile ? (
+              <button
+                onClick={onLogout}
+                className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d]"
+                title="Выйти"
+              >
+                <img src="/logout.svg" alt="Выйти" className="w-5 h-5" />
+              </button>
+            ) : (
+              <Link
+                to="/profile/"
+                className="px-4 py-2 bg-[#6d5bd0] hover:bg-[#5d4bc0] text-white text-[13px] rounded-xl font-['Inter'] font-medium transition-colors"
+              >
+                Мой профиль
+              </Link>
+            )}
           </div>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 py-6 md:py-10">
+      <div className="max-w-5xl mx-auto px-4 py-6 md:py-10">
         {/* Сообщения */}
-        {error && (
+        {isOwnProfile && error && (
           <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-xl font-['Inter'] text-[14px]">
             {error}
           </div>
         )}
-        {success && (
+        {isOwnProfile && success && (
           <div className="mb-6 p-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-xl font-['Inter'] text-[14px]">
             {success}
           </div>
@@ -202,7 +251,7 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
         {/* Профиль - Аватар и имя */}
         <div className="bg-white dark:bg-[#25213b] rounded-2xl p-6 md:p-8 shadow-sm border border-[#e8e4ff] dark:border-[#3d3860] mb-6">
           <h2 className="font-['Inter'] font-bold text-[18px] text-[#25213b] dark:text-white mb-6">
-            Профиль
+            Информация о пользователе
           </h2>
           
           <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -217,21 +266,23 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
                   </svg>
                 )}
               </div>
-              <label className="cursor-pointer px-4 py-2 bg-[#6d5bd0] hover:bg-[#5d4bc0] text-white text-[13px] rounded-xl font-['Inter'] font-medium transition-colors">
-                {loading ? 'Загрузка...' : 'Загрузить аватар'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                  disabled={loading}
-                />
-              </label>
+              {isOwnProfile && (
+                <label className="cursor-pointer px-4 py-2 bg-[#6d5bd0] hover:bg-[#5d4bc0] text-white text-[13px] rounded-xl font-['Inter'] font-medium transition-colors">
+                  {loading ? 'Загрузка...' : 'Загрузить аватар'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    disabled={loading}
+                  />
+                </label>
+              )}
             </div>
             
             {/* Имя пользователя */}
             <div className="flex-1 w-full">
-              {isEditing ? (
+              {isOwnProfile && isEditing ? (
                 <form onSubmit={handleProfileUpdate}>
                   <div className="mb-4">
                     <label className="block font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
@@ -265,20 +316,22 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white">
-                      {user?.username}
+                      {displayUser?.username}
                     </h3>
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="text-[#6d5bd0] hover:text-[#5d4bc0] text-[13px] font-['Inter']"
-                    >
-                      Изменить
-                    </button>
+                    {isOwnProfile && (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="text-[#6d5bd0] hover:text-[#5d4bc0] text-[13px] font-['Inter']"
+                      >
+                        Изменить
+                      </button>
+                    )}
                   </div>
                   <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">
-                    Роль: {user?.role === 'admin' ? 'Администратор' : 'Пользователь'}
+                    Роль: {displayUser?.role === 'admin' ? 'Администратор' : 'Пользователь'}
                   </p>
                   <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">
-                    ID: {user?.id}
+                    ID: {displayUser?.id}
                   </p>
                 </div>
               )}
@@ -286,62 +339,110 @@ export function Profile({ darkMode, setDarkMode, user, onLogout }) {
           </div>
         </div>
 
-        {/* Смена пароля */}
+        {/* Товары пользователя */}
         <div className="bg-white dark:bg-[#25213b] rounded-2xl p-6 md:p-8 shadow-sm border border-[#e8e4ff] dark:border-[#3d3860]">
           <h2 className="font-['Inter'] font-bold text-[18px] text-[#25213b] dark:text-white mb-6">
-            Смена пароля
+            Товары пользователя ({userProducts.length})
           </h2>
           
-          <form onSubmit={handlePasswordChange}>
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="block font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                  Текущий пароль
-                </label>
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-11 rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                  Новый пароль
-                </label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-11 rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
-                  required
-                  minLength={6}
-                />
-              </div>
-              <div>
-                <label className="block font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                  Подтвердите новый пароль
-                </label>
-                <input
-                  type="password"
-                  value={newPasswordConfirm}
-                  onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-11 rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
-                  required
-                  minLength={6}
-                />
-              </div>
+          {productsLoading ? (
+            <div className="text-center py-8 font-['Inter'] text-[#6e6893] dark:text-[#b8b3d4]">
+              Загрузка...
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-3 bg-[#6d5bd0] hover:bg-[#5d4bc0] disabled:opacity-50 text-white text-[14px] rounded-xl font-['Inter'] font-medium transition-colors"
-            >
-              {loading ? 'Сохранение...' : 'Изменить пароль'}
-            </button>
-          </form>
+          ) : userProducts.length === 0 ? (
+            <div className="text-center py-8 font-['Inter'] text-[#6e6893] dark:text-[#b8b3d4]">
+              Нет товаров
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {userProducts.map(product => (
+                <Link 
+                  to={`/product/${product.id}/`}
+                  key={product.id}
+                  className="bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl overflow-hidden border border-[#e8e4ff] dark:border-[#3d3860] hover:border-[#6d5bd0] dark:hover:border-[#6d5bd0] transition-colors"
+                >
+                  <div className="h-32 bg-[#f0eeff] dark:bg-[#25213b] flex items-center justify-center">
+                    {product.image ? (
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <img src="/nothas_image.svg" alt="Нет изображения" className="w-12 h-12 opacity-50" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-['Inter'] font-semibold text-[14px] text-[#25213b] dark:text-white mb-1 truncate">
+                      {product.name}
+                    </h3>
+                    <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">
+                      {product.category_name}
+                    </p>
+                    <p className="font-['Inter'] font-bold text-[16px] text-[#6d5bd0] mt-1">
+                      ${product.price}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Смена пароля (только для своего профиля) */}
+        {isOwnProfile && (
+          <div className="bg-white dark:bg-[#25213b] rounded-2xl p-6 md:p-8 shadow-sm border border-[#e8e4ff] dark:border-[#3d3860] mt-6">
+            <h2 className="font-['Inter'] font-bold text-[18px] text-[#25213b] dark:text-white mb-6">
+              Смена пароля
+            </h2>
+            
+            <form onSubmit={handlePasswordChange}>
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
+                    Текущий пароль
+                  </label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-11 rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
+                    Новый пароль
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-11 rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div>
+                  <label className="block font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
+                    Подтвердите новый пароль
+                  </label>
+                  <input
+                    type="password"
+                    value={newPasswordConfirm}
+                    onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                    className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-11 rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-3 bg-[#6d5bd0] hover:bg-[#5d4bc0] disabled:opacity-50 text-white text-[14px] rounded-xl font-['Inter'] font-medium transition-colors"
+              >
+                {loading ? 'Сохранение...' : 'Изменить пароль'}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -66,3 +66,10 @@ class ProductViewSet(viewsets.ModelViewSet):
             'users_count': User.objects.count(),
             'pending_requests': ProductRequest.objects.filter(status='pending').count(),
         })
+
+    @action(detail=False, methods=['get'], url_path='by-user/(?P<user_id>[^/.]+)')
+    def by_user(self, request, user_id=None):
+        """Получить товары пользователя"""
+        products = self.queryset.filter(user_id=user_id)
+        serializer = self.get_serializer(products, many=True)
+        return Response(serializer.data)

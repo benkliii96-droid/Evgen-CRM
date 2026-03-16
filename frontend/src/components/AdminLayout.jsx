@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from '../router';
 import { NotificationsPanel } from './NotificationsPanel';
 
 const API_URL = '';
@@ -77,8 +78,8 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
                 <img src="/moon.svg" alt="Луна" className="w-5 h-5" />
               )}
             </button>
-            <a
-              href="/profile/"
+            <Link
+              to="/profile/"
               className="flex items-center gap-2 text-[#6e6893] dark:text-[#b8b3d4] hover:text-[#6d5bd0] dark:hover:text-[#6d5bd0] transition-colors"
             >
               {user?.avatar ? (
@@ -91,7 +92,7 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
                 </div>
               )}
               <span className="font-['Inter'] text-[14px]">{user?.username}</span>
-            </a>
+            </Link>
             <button
               onClick={onLogout}
               className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d] transition-colors"
@@ -106,30 +107,30 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
       <div className="flex">
         <aside className="w-64 bg-white dark:bg-[#25213b] min-h-[calc(100vh-64px)] p-4 border-r border-[#e8e4ff] dark:border-[#3d3860]">
           <nav className="space-y-2">
-            <a
-              href="/admin/"
+            <Link
+              to="/admin/"
               className="block px-4 py-3 rounded-xl font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] transition-colors"
             >
               Главная
-            </a>
-            <a
-              href="/admin/products/"
+            </Link>
+            <Link
+              to="/admin/products/"
               className="block px-4 py-3 rounded-xl font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] transition-colors"
             >
               Товары
-            </a>
-            <a
-              href="/admin/users/"
+            </Link>
+            <Link
+              to="/admin/users/"
               className="block px-4 py-3 rounded-xl font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] transition-colors"
             >
               Пользователи
-            </a>
-            <a
-              href="/admin/requests/"
+            </Link>
+            <Link
+              to="/admin/requests/"
               className="block px-4 py-3 rounded-xl font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] transition-colors"
             >
               Запросы
-            </a>
+            </Link>
           </nav>
         </aside>
 

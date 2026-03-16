@@ -23,7 +23,7 @@ import { AdminRequests } from './components/AdminRequests';
 const API_URL = ''; // Пустой = относительный URL, работает и для HTTP и для HTTPS
 
 // Компонент-обёртка для профиля с управлением темой и данными пользователя
-function ProfileWrapper() {
+function ProfileWrapper({ viewUserId }) {
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
@@ -53,6 +53,20 @@ function ProfileWrapper() {
   }, []);
 
   useEffect(() => {
+    // Если это чужой профиль - не нужно загружать свои данные
+    if (viewUserId) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch(`${API_URL}/api/auth/me/`, {
+          headers: { 'Authorization': `Token ${token}` }
+        })
+          .then(res => res.ok ? res.json() : Promise.reject())
+          .then(data => setUser(data))
+          .catch(() => {});
+      }
+      return;
+    }
+    
     const token = localStorage.getItem('token');
     if (token) {
       fetch(`${API_URL}/api/auth/me/`, {
@@ -67,7 +81,7 @@ function ProfileWrapper() {
     } else {
       window.location.href = '/';
     }
-  }, []);
+  }, [viewUserId]);
 
   const handleLogout = () => {
     const token = localStorage.getItem('token');
@@ -81,7 +95,7 @@ function ProfileWrapper() {
     window.location.href = '/';
   };
 
-  if (!user) {
+  if (!viewUserId && !user) {
     return (
       <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] flex items-center justify-center">
         <div className="font-['Inter'] text-[#6e6893]">Загрузка...</div>
@@ -95,6 +109,7 @@ function ProfileWrapper() {
       setDarkMode={setDarkMode}
       user={user}
       onLogout={handleLogout}
+      viewUserId={viewUserId}
     />
   );
 }
@@ -278,7 +293,10 @@ const [unreadCount, setUnreadCount] = useState(0);
                   <h3 className="font-['Inter'] font-semibold text-[16px] text-[#25213b] dark:text-white mb-1">{product.name}</h3>
                   <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">{product.category_name}</p>
                   {product.user_username && (
-                    <div className="flex items-center gap-2 mb-2">
+                    <Link 
+                      to={`/user/${product.user}/`}
+                      className="flex items-center gap-2 mb-2 hover:opacity-80 transition-opacity"
+                    >
                       {product.user_avatar ? (
                         <img src={product.user_avatar} alt="" className="w-5 h-5 rounded-full object-cover" />
                       ) : (
@@ -291,7 +309,7 @@ const [unreadCount, setUnreadCount] = useState(0);
                       <span className="font-['Inter'] text-[12px] text-[#8b83ba] dark:text-[#6e6893]">
                         {product.user_username}
                       </span>
-                    </div>
+                    </Link>
                   )}
                   <div className="flex items-center justify-between mb-2">
                     {product.has_discount && product.discount_percent > 0 ? (
@@ -527,6 +545,12 @@ function AdminPage() {
 
 function App() {
   const location = useLocation();
+  
+  // Страница профиля другого пользователя (/user/123/)
+  const userMatch = location.match(/^\/user\/(\d+)\/$/);
+  if (userMatch) {
+    return <ProfileWrapper viewUserId={userMatch[1]} />;
+  }
   
   // Страница профиля
   if (location === '/profile/') {
