@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 const API_URL = '';
 
-export function ProductRequestModal({ categories, onClose }) {
+export function ProductRequestModal({ categories, onClose, onError }) {
   const [formData, setFormData] = useState({
     name: '',
     category: categories?.[0]?.id || '',
@@ -113,7 +113,11 @@ export function ProductRequestModal({ categories, onClose }) {
         });
         
         if (!res.ok) {
-          throw new Error('Ошибка при отправке');
+          const errText = await res.text();
+          console.error('Ошибка сервера:', res.status, errText);
+          if (onError) onError();
+          setLoading(false);
+          return;
         }
       } else {
         // Отправляем как JSON
@@ -138,14 +142,19 @@ export function ProductRequestModal({ categories, onClose }) {
         });
         
         if (!res.ok) {
-          throw new Error('Ошибка при отправке');
+          const errText = await res.text();
+          console.error('Ошибка сервера:', res.status, errText);
+          if (onError) onError();
+          setLoading(false);
+          return;
         }
       }
       
       setSuccess(true);
       setTimeout(onClose, 2000);
     } catch (err) {
-      console.error(err);
+      console.error('Ошибка при отправке:', err);
+      // Не показываем ErrorModal здесь, так как он уже показан в if (!res.ok)
     } finally {
       setLoading(false);
     }

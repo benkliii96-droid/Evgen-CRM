@@ -19,7 +19,7 @@ import { AdminUsers } from './components/AdminUsers';
 import { AdminProducts } from './components/AdminProducts';
 import { AdminRequests } from './components/AdminRequests';
 
-const API_URL = '';
+const API_URL = ''; // Пустой = относительный URL, работает и для HTTP и для HTTPS
 
 function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogout, onLoginClick }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,6 +27,7 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
   const [showCategoryRequest, setShowCategoryRequest] = useState(false);
   const [showProductRequest, setShowProductRequest] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const unreadCount = 0;
   const [visibleCount, setVisibleCount] = useState(12);
   const loaderRef = useRef(null);
@@ -251,7 +252,12 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
         <ProductRequestModal 
           categories={categories}
           onClose={() => setShowProductRequest(false)} 
+          onError={() => setIsErrorModalOpen(true)}
         />
+      )}
+
+      {isErrorModalOpen && (
+        <ErrorModal onClose={() => setIsErrorModalOpen(false)} />
       )}
 
       {showNotifications && (
