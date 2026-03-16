@@ -6,6 +6,7 @@ export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false })
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showUnreadOnly, setShowUnreadOnly] = useState(true);
   const [productRequests, setProductRequests] = useState([]);
   const [categoryRequests, setCategoryRequests] = useState([]);
   
@@ -521,6 +522,13 @@ await fetch(`${API_URL}/api/notifications/mark_all_read/`, {
               Уведомления
             </h2>
 
+            <button
+              onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+              className="px-3 py-1 rounded-lg text-xs font-['Inter'] bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860] text-[#6e6893] dark:text-[#b8b3d4]"
+            >
+              {showUnreadOnly ? 'Непрочитанные' : 'Все'}
+            </button>
+
             {unreadCount > 0 && (
               <span className="bg-[#6d5bd0] text-white text-xs px-2 py-1 rounded-full font-['Inter'] font-medium">
                 {unreadCount}
@@ -557,9 +565,11 @@ await fetch(`${API_URL}/api/notifications/mark_all_read/`, {
             <div className="p-8 text-center text-[#6e6893] dark:text-[#b8b3d4] font-['Inter']">
               Уведомлений нет
             </div>
-  ) : (
-    <div className="divide-y divide-[#e8e4ff] dark:divide-[#3d3860]">
-      {notifications.map(notif => (
+          ) : (
+            <div className="divide-y divide-[#e8e4ff] dark:divide-[#3d3860]">
+              {notifications
+                .filter(notif => !showUnreadOnly || !notif.is_read)
+                .map(notif => (
         <div
           key={notif.id}
                   onClick={() => !notif.is_read && markAsRead(notif.id)}

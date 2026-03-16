@@ -77,7 +77,21 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
                 <img src="/moon.svg" alt="Луна" className="w-5 h-5" />
               )}
             </button>
-            <span className="font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">{user?.username}</span>
+            <a
+              href="/profile/"
+              className="flex items-center gap-2 text-[#6e6893] dark:text-[#b8b3d4] hover:text-[#6d5bd0] dark:hover:text-[#6d5bd0] transition-colors"
+            >
+              {user?.avatar ? (
+                <img src={user.avatar} alt="Аватар" className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-[#f8f7ff] dark:bg-[#2d2847] flex items-center justify-center">
+                  <svg className="w-4 h-4 text-[#6e6893] dark:text-[#b8b3d4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+              )}
+              <span className="font-['Inter'] text-[14px]">{user?.username}</span>
+            </a>
             <button
               onClick={onLogout}
               className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d] transition-colors"

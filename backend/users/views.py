@@ -87,3 +87,82 @@ def toggle_theme_view(request):
     dark_mode = request.session.get('dark_mode', False)
     request.session['dark_mode'] = not dark_mode
     return Response({'dark_mode': request.session['dark_mode']})
+
+
+@api_view(['POST'])
+def change_password_view(request):
+    """Смена пароля"""
+    if not request.user.is_authenticated:
+        return Response({'error': 'Не авторизован'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    current_password = request.data.get('current_password')
+    new_password = request.data.get('new_password')
+    new_password_confirm = request.data.get('new_password_confirm')
+    
+    if not current_password or not new_password or not new_password_confirm:
+        return Response({'error': 'Заполните все поля'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if new_password != new_password_confirm:
+        return Response({'error': 'Новые пароли не совпадают'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if len(new_password) < 6:
+        return Response({'error': 'Пароль должен быть не менее 6 символов'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not request.user.check_password(current_password):
+        return Response({'error': 'Неверный текущий пароль'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    request.user.set_password(new_password)
+    request.user.save()
+    return Response({'success': True})
+
+
+@api_view(['POST'])
+def upload_avatar_view(request):
+    """Загрузка аватара"""
+    if not request.user.is_authenticated:
+        return Response({'error': 'Не авторизован'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    avatar = request.FILES.get('avatar')
+    if not avatar:
+        return Response({'error': 'Выберите изображение'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Проверка типа файла
+    if not avatar.content_type.startswith('image/'):
+        return Response({'error': 'Файл должен быть изображением'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Проверка размера (макс 5MB)
+    if avatar.size > 5 * 1024 * 1024:
+        return Response({'error': 'Размер файла не должен превышать 5MB'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Удаляем старый аватар
+    if request.user.avatar:
+        request.user.avatar.delete()
+    
+    request.user.avatar = avatar
+    request.user.save()
+    
+    return Response({
+        'success': True,
+        'avatar': request.build_absolute_uri(request.user.avatar.url) if request.user.avatar else None
+    })
+
+
+@api_view(['GET', 'PUT'])
+def profile_view(request):
+    """Получение и обновление профиля"""
+    if not request.user.is_authenticated:
+        return Response({'error': 'Не авторизован'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    if request.method == 'GET':
+        return Response(UserSerializer(request.user).data)
+    
+    # PUT - обновление профиля
+    username = request.data.get('username')
+    
+    if username and username != request.user.username:
+        if User.objects.filter(username=username).exclude(id=request.user.id).exists():
+            return Response({'error': 'Это имя пользователя уже занято'}, status=status.HTTP_400_BAD_REQUEST)
+        request.user.username = username
+    
+    request.user.save()
+    return Response(UserSerializer(request.user).data)

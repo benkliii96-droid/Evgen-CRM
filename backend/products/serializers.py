@@ -34,15 +34,25 @@ class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     total = serializers.ReadOnlyField()
     image = serializers.SerializerMethodField()
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    user_avatar = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'category', 'category_name', 'unit', 'quantity',
+            'id', 'name', 'category', 'category_name', 'user', 'user_username', 'user_avatar', 'unit', 'quantity',
             'price', 'has_discount', 'discount_percent', 'description',
             'image', 'total', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'user']
+    
+    def get_user_avatar(self, obj):
+        if obj.user and obj.user.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.user.avatar.url)
+            return f'https://csmevg.ru{obj.user.avatar.url}'
+        return None
 
     def get_image(self, obj):
         if obj.image:
@@ -59,8 +69,9 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'name', 'category', 'unit', 'quantity', 'price',
-            'has_discount', 'discount_percent', 'description', 'image'
+            'has_discount', 'discount_percent', 'description', 'image', 'user'
         ]
+        read_only_fields = ['user']
 
     def validate_name(self, value):
         return filter_bad_words(value)

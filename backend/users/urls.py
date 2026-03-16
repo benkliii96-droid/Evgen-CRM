@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserViewSet, register_view, login_view, logout_view, me_view, toggle_theme_view
+from .views import UserViewSet, register_view, login_view, logout_view, me_view, toggle_theme_view, change_password_view, upload_avatar_view, profile_view
 from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
@@ -7,6 +7,9 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('me/', me_view, name='me'),
+    path('profile/', profile_view, name='profile'),
+    path('profile/change-password/', change_password_view, name='change-password'),
+    path('profile/avatar/', upload_avatar_view, name='upload-avatar'),
     path('toggle-theme/', toggle_theme_view, name='toggle-theme'),
     path('users/', UserViewSet.as_view({'get': 'list', 'post': 'create'}), name='users'),
     path('users/<int:pk>/', UserViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='user-detail'),

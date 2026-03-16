@@ -45,6 +45,9 @@ class ProductViewSet(viewsets.ModelViewSet):
             return ProductCreateSerializer
         return ProductSerializer
     
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
     @action(detail=False, methods=['get'])
     def stats(self, request):
         products = Product.objects.all()

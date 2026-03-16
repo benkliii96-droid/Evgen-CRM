@@ -14,12 +14,90 @@ import { ProductRequestModal } from './components/ProductRequestModal';
 import { CategoryRequestModal } from './components/CategoryRequestModal';
 import { ProductDetail } from './components/ProductDetail';
 import { NotificationsPanel } from './components/NotificationsPanel';
+import { Profile } from './components/Profile';
 import { AdminLayout, AdminDashboard } from './components/AdminLayout';
 import { AdminUsers } from './components/AdminUsers';
 import { AdminProducts } from './components/AdminProducts';
 import { AdminRequests } from './components/AdminRequests';
 
 const API_URL = ''; // Пустой = относительный URL, работает и для HTTP и для HTTPS
+
+// Компонент-обёртка для профиля с управлением темой и данными пользователя
+function ProfileWrapper() {
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark';
+    if (isDark !== darkMode) {
+      setDarkMode(isDark);
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch(`${API_URL}/api/auth/me/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(data => setUser(data))
+        .catch(() => {
+          localStorage.removeItem('token');
+          window.location.href = '/';
+        });
+    } else {
+      window.location.href = '/';
+    }
+  }, []);
+
+  const handleLogout = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch(`${API_URL}/api/auth/logout/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Token ${token}` }
+      }).catch(() => {});
+    }
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] flex items-center justify-center">
+        <div className="font-['Inter'] text-[#6e6893]">Загрузка...</div>
+      </div>
+    );
+  }
+
+  return (
+    <Profile
+      darkMode={darkMode}
+      setDarkMode={setDarkMode}
+      user={user}
+      onLogout={handleLogout}
+    />
+  );
+}
 
 function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogout, onLoginClick }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,7 +148,7 @@ const [unreadCount, setUnreadCount] = useState(0);
   }, [hasMore]);
 
   return (
-    <div className="min-h-screen bg-[#f2f0f9] dark:bg-[NotificationsPanel#1a1625] transition-colors">
+    <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] transition-colors">
       <header className="bg-white dark:bg-[#25213b] shadow-sm">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
           <h1 className="font-['Inter'] font-bold text-[18px] sm:text-[20px] md:text-[24px] text-[#25213b] dark:text-white whitespace-nowrap">
@@ -79,6 +157,20 @@ const [unreadCount, setUnreadCount] = useState(0);
           <div className="flex items-center gap-2 sm:gap-3">
             {user ? (
               <>
+                <Link
+                  to="/profile/"
+                  className="flex items-center gap-2 text-[#6e6893] dark:text-[#b8b3d4] hover:text-[#6d5bd0] dark:hover:text-[#6d5bd0] transition-colors"
+                >
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="Аватар" className="w-8 h-8 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-[#f8f7ff] dark:bg-[#2d2847] flex items-center justify-center">
+                      <svg className="w-4 h-4 text-[#6e6893] dark:text-[#b8b3d4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                  )}
+                </Link>
                 <span className="hidden sm:inline font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">{user.username}</span>
                 <div className="relative">
                   <button
@@ -185,6 +277,22 @@ const [unreadCount, setUnreadCount] = useState(0);
                 <div className="p-4">
                   <h3 className="font-['Inter'] font-semibold text-[16px] text-[#25213b] dark:text-white mb-1">{product.name}</h3>
                   <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">{product.category_name}</p>
+                  {product.user_username && (
+                    <div className="flex items-center gap-2 mb-2">
+                      {product.user_avatar ? (
+                        <img src={product.user_avatar} alt="" className="w-5 h-5 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-[#e8e4ff] dark:bg-[#3d3860] flex items-center justify-center">
+                          <svg className="w-3 h-3 text-[#6e6893] dark:text-[#b8b3d4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                      )}
+                      <span className="font-['Inter'] text-[12px] text-[#8b83ba] dark:text-[#6e6893]">
+                        {product.user_username}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-2">
                     {product.has_discount && product.discount_percent > 0 ? (
                       <>
@@ -330,370 +438,14 @@ function AdminPage() {
     }
   }, [darkMode]);
 
-  const handleLogin = (userData, token) => {
-    setUser(userData);
-    localStorage.setItem('token', token);
-    setIsLoginModalOpen(false);
-  };
-
-  const handleLogout = () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetch(`${API_URL}/api/auth/logout/`, {
-        method: 'POST',
-        headers: { 'Authorization': `Token ${token}` }
-      }).catch(() => {});
-    }
-    setUser(null);
-    localStorage.removeItem('token');
-  };
-
-  const filteredProducts = useMemo(() => {
-    return products.filter(p => {
-      const matchesSearch = p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.category_name?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = !filters.category || p.category_name === filters.category;
-      const matchesPriceMin = !filters.priceMin || parseFloat(p.price) >= parseFloat(filters.priceMin);
-      const matchesPriceMax = !filters.priceMax || parseFloat(p.price) <= parseFloat(filters.priceMax);
-      const matchesDiscount = filters.hasDiscount === '' || 
-        (filters.hasDiscount === 'true' && p.has_discount) ||
-        (filters.hasDiscount === 'false' && !p.has_discount);
-      return matchesSearch && matchesCategory && matchesPriceMin && matchesPriceMax && matchesDiscount;
-    });
-  }, [products, searchQuery, filters]);
-
-  const sortedProducts = useMemo(() => {
-    const sorted = [...filteredProducts];
-    sorted.sort((a, b) => {
-      let aVal, bVal;
-      
-      if (sortConfig.key === 'total') {
-        aVal = parseFloat(a.total) || 0;
-        bVal = parseFloat(b.total) || 0;
-      } else {
-        aVal = a[sortConfig.key];
-        bVal = b[sortConfig.key];
-        if (typeof aVal === 'string') {
-          aVal = aVal.toLowerCase();
-          bVal = bVal.toLowerCase();
-        }
-      }
-      
-      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-    return sorted;
-  }, [filteredProducts, sortConfig]);
-
-  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
-  const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return sortedProducts.slice(start, start + itemsPerPage);
-  }, [sortedProducts, currentPage, itemsPerPage]);
-
-  const totalCost = useMemo(() => {
-    return products.reduce((sum, p) => sum + (parseFloat(p.total) || 0), 0);
-  }, [products]);
-
-  const handleSort = (key) => {
-    setSortConfig(prev => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
-    }));
-  };
-
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setIsProductModalOpen(true);
-  };
-
-  const handleEditProduct = (product) => {
-    setEditingProduct(product);
-    setIsProductModalOpen(true);
-  };
-
-  const handleDeleteClick = (id) => {
-    setDeletingId(id);
-    setIsConfirmModalOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    const token = localStorage.getItem('token');
-    try {
-      await fetch(`${API_URL}/api/products/${deletingId}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Token ${token}` }
-      });
-      setProducts(prev => prev.filter(p => p.id !== deletingId));
-    } catch (err) {
-      console.error(err);
-    }
-    setIsConfirmModalOpen(false);
-    setDeletingId(null);
-  };
-
-  const handleSaveProduct = async (formData) => {
-    const token = localStorage.getItem('token');
-    try {
-      // Проверяем есть ли изображение
-      const hasImage = formData.get('image') instanceof File;
-      let res;
-      
-      // Если есть изображение - используем FormData, иначе JSON
-      if (hasImage) {
-        // Отправляем как FormData с токеном в заголовке
-        if (editingProduct) {
-          res = await fetch(`${API_URL}/api/products/${editingProduct.id}/`, {
-            method: 'PATCH',
-            headers: { 
-              'Authorization': `Token ${token}`
-            },
-            body: formData
-          });
-        } else {
-          res = await fetch(`${API_URL}/api/products/`, {
-            method: 'POST',
-            headers: { 
-              'Authorization': `Token ${token}`
-            },
-            body: formData
-          });
-        }
-      } else {
-        // Отправляем как JSON
-        const data = {};
-        formData.forEach((value, key) => {
-          if (key === 'hasDiscount') {
-            data[key] = value === 'true';
-          } else if (key === 'category') {
-            data[key] = parseInt(value);
-          } else if (key === 'quantity' || key === 'discountPercent') {
-            data[key] = parseInt(value);
-          } else if (key === 'price') {
-            data[key] = parseFloat(value);
-          } else if (key !== 'image') {
-            data[key] = value;
-          }
-        });
-
-        if (editingProduct) {
-          res = await fetch(`${API_URL}/api/products/${editingProduct.id}/`, {
-            method: 'PATCH',
-            headers: { 
-              'Authorization': `Token ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          });
-        } else {
-          res = await fetch(`${API_URL}/api/products/`, {
-            method: 'POST',
-            headers: { 
-              'Authorization': `Token ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          });
-        }
-      }
-
-      // Проверяем статус ответа
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        console.error('Ошибка сервера:', res.status, errorData);
-        setIsErrorModalOpen(true);
-        return;
-      }
-
-      const data = await res.json();
-      
-      if (editingProduct) {
-        setProducts(products.map(p => p.id === editingProduct.id ? data : p));
-      } else {
-        setProducts([...products, data]);
-      }
-      
-      setIsProductModalOpen(false);
-      setEditingProduct(null);
-    } catch (err) {
-      console.error('Ошибка при сохранении:', err);
-      setIsErrorModalOpen(true);
-    }
-  };
-
-  const handleApplyFilters = (newFilters) => {
-    setFilters(newFilters);
-    setCurrentPage(1);
-    setIsFilterModalOpen(false);
-  };
-
-  const handleImageClick = (image) => {
-    if (image) {
-      setSelectedImage(image);
-      setIsImageModalOpen(true);
-    }
-  };
-
-  const handleItemsPerPageChange = (value) => {
-    setItemsPerPage(Number(value));
-    setCurrentPage(1);
-  };
-
-  const minPrice = useMemo(() => Math.min(...products.map(p => parseFloat(p.price) || 0), 0), [products]);
-  const maxPrice = useMemo(() => Math.max(...products.map(p => parseFloat(p.price) || 0), 9999), [products]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] p-3 sm:p-4 md:p-6 flex items-center justify-center">
-        <div className="font-['Inter'] text-[#6e6893]">Загрузка...</div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-[#25213b] rounded-2xl p-8 text-center max-w-md">
-          <h2 className="font-['Inter'] font-bold text-[24px] text-[#25213b] dark:text-white mb-4">
-            Админ-панель
-          </h2>
-          <p className="font-['Inter'] text-[#6e6893] dark:text-[#b8b3d4] mb-6">
-            Войдите для управления товарами
-          </p>
-          <button
-            onClick={() => setIsLoginModalOpen(true)}
-            className="bg-[#6d5bd0] px-6 py-3 rounded-xl font-['Inter'] font-semibold text-[14px] text-white hover:bg-[#5d4bc0]"
-          >
-            Войти
-          </button>
-        </div>
-        {isLoginModalOpen && (
-          <LoginModal
-            onClose={() => setIsLoginModalOpen(false)}
-            onLogin={handleLogin}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625] p-3 sm:p-4 md:p-6 transition-colors">
-      <Header 
-        totalCost={totalCost} 
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        user={user}
-        onLogout={handleLogout}
-        onNotificationsClick={() => setShowNotifications(true)}
-      />
-      
-      <div className="h-[2px] bg-[#6d5bd0] mb-3 sm:mb-4 md:mb-6"></div>
-
-      <div className="bg-white dark:bg-[#25213b] rounded-2xl p-3 sm:p-4 md:p-6 transition-colors">
-        <Toolbar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onFilterClick={() => setIsFilterModalOpen(true)}
-          onAddClick={handleAddProduct}
-        />
-
-        <ProductTable
-          products={paginatedProducts}
-          sortConfig={sortConfig}
-          onSort={handleSort}
-          onEdit={handleEditProduct}
-          onDelete={handleDeleteClick}
-          onImageClick={handleImageClick}
-        />
-
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          totalItems={sortedProducts.length}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
-        />
-      </div>
-
-      {isProductModalOpen && (
-        <ProductModal
-          product={editingProduct}
-          categories={categories}
-          onClose={() => setIsProductModalOpen(false)}
-          onSave={handleSaveProduct}
-          onError={() => setIsErrorModalOpen(true)}
-        />
-      )}
-
-      {isFilterModalOpen && (
-        <FilterModal
-          filters={filters}
-          categories={categories}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          onClose={() => setIsFilterModalOpen(false)}
-          onApply={handleApplyFilters}
-        />
-      )}
-
-      {isErrorModalOpen && (
-        <ErrorModal onClose={() => setIsErrorModalOpen(false)} />
-      )}
-
-      {isImageModalOpen && (
-        <ImageModal image={selectedImage} onClose={() => setIsImageModalOpen(false)} />
-      )}
-
-      {isConfirmModalOpen && (
-        <ConfirmModal
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setIsConfirmModalOpen(false)}
-        />
-      )}
-
-      {isLoginModalOpen && (
-        <LoginModal
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-      )}
-
-      {showNotifications && (
-        <NotificationsPanel 
-          darkMode={darkMode}
-          onClose={() => setShowNotifications(false)}
-          user={user}
-        />
-      )}
-    </div>
-  );
-}
-
-function AdminPages() {
-  const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [stats, setStats] = useState(null);
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('theme');
-      if (saved) return saved === 'dark';
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return false;
-  });
-
+  // Синхронизация темы при монтировании
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark';
+    if (isDark !== darkMode) {
+      setDarkMode(isDark);
     }
-  }, [darkMode]);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -774,6 +526,11 @@ function AdminPages() {
 
 function App() {
   const location = useLocation();
+  
+  // Страница профиля
+  if (location === '/profile/') {
+    return <ProfileWrapper />;
+  }
   
   // Страница товара
   if (location.startsWith('/product/')) {

@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+
 
 class Category(models.Model):
     name = models.CharField('Название', max_length=100, unique=True)
@@ -24,6 +26,7 @@ class Product(models.Model):
     
     name = models.CharField('Наименование', max_length=200)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория', related_name='products')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name='Добавил', related_name='products', null=True, blank=True)
     unit = models.CharField('Единица измерения', max_length=10, choices=UNIT_CHOICES, default='шт')
     quantity = models.PositiveIntegerField('Количество', default=1)
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)

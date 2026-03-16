@@ -240,10 +240,35 @@ export function ProductDetail() {
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
   }, [darkMode]);
+
+  // Синхронизация темы при изменении в localStorage (для вкладок и переходов)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('theme');
+      const isDark = saved === 'dark';
+      if (isDark !== darkMode) {
+        setDarkMode(isDark);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [darkMode]);
+
+  // Синхронизация темы при монтировании компонента
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark';
+    if (isDark !== darkMode) {
+      setDarkMode(isDark);
+    }
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -413,6 +438,27 @@ export function ProductDetail() {
 
             {/* Info Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {product.user_username && (
+                <div className="bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl p-4">
+                  <p className="font-['Inter'] text-[12px] text-[#6e6893] dark:text-[#b8b3d4] mb-1">
+                    Добавил
+                  </p>
+                  <div className="flex items-center gap-2">
+                    {product.user_avatar ? (
+                      <img src={product.user_avatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-[#e8e4ff] dark:bg-[#3d3860] flex items-center justify-center">
+                        <svg className="w-4 h-4 text-[#6e6893] dark:text-[#b8b3d4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                    )}
+                    <p className="font-['Inter'] font-semibold text-[14px] text-[#25213b] dark:text-white">
+                      {product.user_username}
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl p-4">
                 <p className="font-['Inter'] text-[12px] text-[#6e6893] dark:text-[#b8b3d4] mb-1">
                   Количество
@@ -438,14 +484,6 @@ export function ProductDetail() {
                 </p>
                 <p className="font-['Inter'] font-semibold text-[18px] text-[#6d5bd0]">
                   ${product.total}
-                </p>
-              </div>
-              <div className="bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl p-4">
-                <p className="font-['Inter'] text-[12px] text-[#6e6893] dark:text-[#b8b3d4] mb-1">
-                  Статус
-                </p>
-                <p className="font-['Inter'] font-semibold text-[18px] text-green-600 dark:text-green-400">
-                  В наличии
                 </p>
               </div>
             </div>
