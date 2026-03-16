@@ -102,6 +102,75 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         
         return Response({'status': 'rejected'})
 
+    @action(detail=False, methods=['post'])
+    def bulk_approve(self, request):
+        """Массовое одобрение заявок"""
+        if not request.user.is_admin:
+            return Response({'error': 'Нет прав'}, status=status.HTTP_403_FORBIDDEN)
+        
+        ids = request.data.get('ids', [])
+        comment = request.data.get('comment', '')
+        
+        if not ids:
+            return Response({'error': 'Не указаны ID заявок'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        pending_requests = ProductRequest.objects.filter(id__in=ids, status='pending')
+        approved_count = 0
+        
+        for product_request in pending_requests:
+            Product.objects.create(
+                name=product_request.name,
+                category=product_request.category,
+                unit=product_request.unit,
+                quantity=product_request.quantity,
+                price=product_request.price,
+                has_discount=product_request.has_discount,
+                discount_percent=product_request.discount_percent,
+                description=product_request.description,
+                image=product_request.image
+            )
+            
+            product_request.status = 'approved'
+            product_request.save()
+            
+            notify_product_approved(product_request)
+            approved_count += 1
+        
+        return Response({
+            'status': 'approved',
+            'approved_count': approved_count,
+            'failed_count': len(ids) - approved_count
+        })
+    
+    @action(detail=False, methods=['post'])
+    def bulk_reject(self, request):
+        """Массовое отклонение заявок"""
+        if not request.user.is_admin:
+            return Response({'error': 'Нет прав'}, status=status.HTTP_403_FORBIDDEN)
+        
+        ids = request.data.get('ids', [])
+        comment = request.data.get('comment', '')
+        
+        if not ids:
+            return Response({'error': 'Не указаны ID заявок'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        pending_requests = ProductRequest.objects.filter(id__in=ids, status='pending')
+        rejected_count = 0
+        
+        for product_request in pending_requests:
+            product_request.status = 'rejected'
+            product_request.admin_comment = comment
+            product_request.save()
+            
+            notify_product_rejected(product_request)
+            rejected_count += 1
+        
+        return Response({
+            'status': 'rejected',
+            'rejected_count': rejected_count,
+            'failed_count': len(ids) - rejected_count
+        })
+
 
 class CategoryRequestViewSet(viewsets.ModelViewSet):
     queryset = CategoryRequest.objects.all()
@@ -174,3 +243,61 @@ class CategoryRequestViewSet(viewsets.ModelViewSet):
         notify_category_rejected(category_request)
         
         return Response({'status': 'rejected'})
+
+    @action(detail=False, methods=['post'])
+    def bulk_approve(self, request):
+        """Массовое одобрение заявок"""
+        if not request.user.is_admin:
+            return Response({'error': 'Нет прав'}, status=status.HTTP_403_FORBIDDEN)
+        
+        ids = request.data.get('ids', [])
+        
+        if not ids:
+            return Response({'error': 'Не указаны ID заявок'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        pending_requests = CategoryRequest.objects.filter(id__in=ids, status='pending')
+        approved_count = 0
+        
+        for category_request in pending_requests:
+            Category.objects.create(name=category_request.name)
+            
+            category_request.status = 'approved'
+            category_request.save()
+            
+            notify_category_approved(category_request)
+            approved_count += 1
+        
+        return Response({
+            'status': 'approved',
+            'approved_count': approved_count,
+            'failed_count': len(ids) - approved_count
+        })
+    
+    @action(detail=False, methods=['post'])
+    def bulk_reject(self, request):
+        """Массовое отклонение заявок"""
+        if not request.user.is_admin:
+            return Response({'error': 'Нет прав'}, status=status.HTTP_403_FORBIDDEN)
+        
+        ids = request.data.get('ids', [])
+        comment = request.data.get('comment', '')
+        
+        if not ids:
+            return Response({'error': 'Не указаны ID заявок'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        pending_requests = CategoryRequest.objects.filter(id__in=ids, status='pending')
+        rejected_count = 0
+        
+        for category_request in pending_requests:
+            category_request.status = 'rejected'
+            category_request.admin_comment = comment
+            category_request.save()
+            
+            notify_category_rejected(category_request)
+            rejected_count += 1
+        
+        return Response({
+            'status': 'rejected',
+            'rejected_count': rejected_count,
+            'failed_count': len(ids) - rejected_count
+        })

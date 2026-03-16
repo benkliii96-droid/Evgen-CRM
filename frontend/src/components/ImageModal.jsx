@@ -6,9 +6,7 @@ export function ImageModal({ image, onClose }) {
           onClick={onClose}
           className="absolute -top-12 right-0 text-white hover:text-gray-300"
         >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
+          <img src="/close-white.svg" alt="Закрыть" className="w-8 h-8" />
         </button>
         <img
           src={image}

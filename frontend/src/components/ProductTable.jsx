@@ -2,24 +2,12 @@ import { TableRow } from './TableRow';
 
 const SortIcon = ({ direction, active }) => {
   if (!active) {
-    return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 md:w-4 md:h-4 opacity-30">
-        <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
-      </svg>
-    );
+    return <img src="/sort.svg" alt="Сортировка" className="w-3 h-3 md:w-4 md:h-4 opacity-30" />;
   }
   if (direction === 'asc') {
-    return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 md:w-4 md:h-4">
-        <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
-      </svg>
-    );
+    return <img src="/sort-asc.svg" alt="По возрастанию" className="w-3 h-3 md:w-4 md:h-4" />;
   }
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 md:w-4 md:h-4">
-      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
-    </svg>
-  );
+  return <img src="/sort-desc.svg" alt="По убыванию" className="w-3 h-3 md:w-4 md:h-4" />;
 };
 
 export function ProductTable({ products, sortConfig, onSort, onEdit, onDelete, onImageClick }) {
