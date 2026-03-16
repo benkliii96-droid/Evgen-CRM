@@ -564,7 +564,7 @@ await fetch(`${API_URL}/api/notifications/mark_all_read/`, {
             </div>
           ) : (
             <div className="divide-y divide-[#e8e4ff] dark:divide-[#3d3860]">
-{notifications.filter(n => !showUnreadOnly || !n.is_read).map(notif => (
+notifications.filter(n => !showUnreadOnly || !n.is_read).filter(n => n.notification_type === 'new_request').map(notif => (
                 <div
                   key={notif.id}
                   onClick={() => !notif.is_read && markAsRead(notif.id)}
