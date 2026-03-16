@@ -48,3 +48,4 @@ backend/*.sqlite3
 # System
 .DS_Store
 Thumbs.db
+TODO.md

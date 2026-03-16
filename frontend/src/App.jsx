@@ -27,6 +27,7 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
   const [showCategoryRequest, setShowCategoryRequest] = useState(false);
   const [showProductRequest, setShowProductRequest] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const unreadCount = 0;
   const [visibleCount, setVisibleCount] = useState(12);
   const loaderRef = useRef(null);
 
