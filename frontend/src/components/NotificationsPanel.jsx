@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 const API_URL = '';
 
 export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false }) {
-const [notifications, setNotifications] = useState([]);
-  const [showUnreadOnly, setShowUnreadOnly] = useState(true);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [productRequests, setProductRequests] = useState([]);
@@ -437,14 +436,18 @@ await fetch(`${API_URL}/api/notifications/mark_all_read/`, {
                             onClick={() => handleApprove(req.type, req.id)}
                             className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-['Inter'] font-medium transition-colors flex items-center gap-1"
                           >
-                            <img src="/check.svg" alt="" className="w-3.5 h-3.5" />
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
                             Одобрить
                           </button>
                           <button
                             onClick={() => handleReject(req.type, req.id)}
                             className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-['Inter'] font-medium transition-colors flex items-center gap-1"
                           >
-                            <img src="/close.svg" alt="" className="w-3.5 h-3.5" />
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                             Отклонить
                           </button>
                         </div>
@@ -514,17 +517,9 @@ await fetch(`${API_URL}/api/notifications/mark_all_read/`, {
         <div className="p-4 md:p-6 border-b border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-between">
           <div className="flex items-center gap-3">
 
-            <div className="flex items-center gap-3">
-              <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white">
-                Уведомления
-              </h2>
-              <button
-                onClick={() => setShowUnreadOnly(!showUnreadOnly)}
-                className="px-3 py-1 rounded-lg text-xs font-['Inter'] bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
-              >
-                {showUnreadOnly ? 'Все' : 'Непрочитанные'}
-              </button>
-            </div>
+            <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white">
+              Уведомления
+            </h2>
 
             {unreadCount > 0 && (
               <span className="bg-[#6d5bd0] text-white text-xs px-2 py-1 rounded-full font-['Inter'] font-medium">
@@ -562,11 +557,11 @@ await fetch(`${API_URL}/api/notifications/mark_all_read/`, {
             <div className="p-8 text-center text-[#6e6893] dark:text-[#b8b3d4] font-['Inter']">
               Уведомлений нет
             </div>
-          ) : (
-            <div className="divide-y divide-[#e8e4ff] dark:divide-[#3d3860]">
-notifications.filter(n => !showUnreadOnly || !n.is_read).filter(n => n.notification_type === 'new_request').map(notif => (
-                <div
-                  key={notif.id}
+  ) : (
+    <div className="divide-y divide-[#e8e4ff] dark:divide-[#3d3860]">
+      {notifications.map(notif => (
+        <div
+          key={notif.id}
                   onClick={() => !notif.is_read && markAsRead(notif.id)}
                   className={`p-4 hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] cursor-pointer transition-colors ${
                     !notif.is_read ? 'bg-[#f4f2ff] dark:bg-[#2d2847]/50' : ''

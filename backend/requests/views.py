@@ -27,9 +27,16 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
+        queryset = ProductRequest.objects.all()
+        
+        # Фильтрация по статусу
+        status_filter = self.request.query_params.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        
         if user.is_admin:
-            return ProductRequest.objects.all()
-        return ProductRequest.objects.filter(user=user)
+            return queryset
+        return queryset.filter(user=user)
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -179,9 +186,16 @@ class CategoryRequestViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
+        queryset = CategoryRequest.objects.all()
+        
+        # Фильтрация по статусу
+        status_filter = self.request.query_params.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        
         if user.is_admin:
-            return CategoryRequest.objects.all()
-        return CategoryRequest.objects.filter(user=user)
+            return queryset
+        return queryset.filter(user=user)
     
     def get_serializer_class(self):
         if self.action == 'create':
