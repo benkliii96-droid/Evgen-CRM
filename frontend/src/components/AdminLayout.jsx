@@ -26,9 +26,9 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
               >
                 <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 dark:brightness-200" />
               </button>
-              {unreadCount > 0 && (
+              {false && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  0
                 </span>
               )}
             </div>
