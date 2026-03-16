@@ -382,6 +382,7 @@ function AdminPage() {
     }
     return false;
   });
+  const [stats, setStats] = useState(null);
 
   const [user, setUser] = useState(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
