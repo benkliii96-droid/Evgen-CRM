@@ -82,7 +82,7 @@ const [notifications, setNotifications] = useState([]);
   const markAsRead = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      await fetch(`${API_URL}/api/notifications/${id}/mark_read_/`, {
+await fetch(`${API_URL}/api/notifications/${id}/mark_read/`, {
         method: 'POST',
         headers: { 'Authorization': `Token ${token}` }
       });
