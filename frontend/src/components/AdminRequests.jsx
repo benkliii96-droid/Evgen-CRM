@@ -6,7 +6,9 @@ export function AdminRequests() {
   const [productRequests, setProductRequests] = useState([]);
   const [categoryRequests, setCategoryRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('products');
+    const [activeTab, setActiveTab] = useState('products');
+  const [selectedProductRequests, setSelectedProductRequests] = useState([]);
+  const [selectedCategoryRequests, setSelectedCategoryRequests] = useState([]); 
 
   useEffect(() => {
     fetchRequests();
@@ -127,7 +129,7 @@ fetch(`${API_URL}/api/requests/categories/?status=pending`, { headers: { 'Author
               : 'bg-white dark:bg-[#25213b] text-[#6e6893] dark:text-[#b8b3d4] border border-[#e8e4ff] dark:border-[#3d3860]'
           }`}
         >
-          Товары ({productRequests.filter(r => r.status === 'pending').length})
+          {selectedProductRequests.length || productRequests.filter(r => r.status === 'pending').length})
         </button>
         <button
           onClick={() => setActiveTab('categories')}
@@ -150,14 +152,38 @@ fetch(`${API_URL}/api/requests/categories/?status=pending`, { headers: { 'Author
           ) : (
             productRequests.map(req => (
               <div key={req.id} className="bg-white dark:bg-[#25213b] rounded-xl p-4 border border-[#e8e4ff] dark:border-[#3d3860]">
-                <div className="flex items-center justify-between">
-                  <div>
+
+                <div className="flex items-start gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer self-start mt-1 flex-shrink-0">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={selectedProductRequests.includes(req.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedProductRequests([...selectedProductRequests, req.id]);
+                          } else {
+                            setSelectedProductRequests(selectedProductRequests.filter(id => id !== req.id));
+                          }
+                        }}
+                        className="peer sr-only"
+                      />
+                      <div className="w-5 h-5 rounded-md border-2 border-[#e8e4ff] dark:border-[#3d3860] peer-checked:bg-[#6d5bd0] peer-checked:border-[#6d5bd0] transition-colors flex items-center justify-center">
+                        {selectedProductRequests.includes(req.id) && (
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                  </label>
+                  <div className="flex-1">
                     <h3 className="font-['Inter'] font-semibold text-[16px] text-[#25213b] dark:text-white">{req.name}</h3>
                     <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">
                       От: {req.user_username} | {req.category_name} | ${req.price} x {req.quantity}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     {getStatusBadge(req.status)}
                     {req.status === 'pending' && (
                       <>
@@ -177,6 +203,7 @@ fetch(`${API_URL}/api/requests/categories/?status=pending`, { headers: { 'Author
                     )}
                   </div>
                 </div>
+
               </div>
             ))
           )}
