@@ -17,15 +17,22 @@ export function Header({ totalCost, darkMode, setDarkMode, user, onLogout, onNot
           </a>
         )}
         {user && onNotificationsClick && (
-          <button
-            onClick={onNotificationsClick}
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white dark:bg-[#25213b] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860] transition-colors flex-shrink-0"
-            type="button"
-            aria-label="Уведомления"
-            title="Уведомления"
-          >
-            <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 sm:w-6 sm:h-6 dark:brightness-200" />
-          </button>
+          <div className="relative">
+            <button
+              onClick={onNotificationsClick}
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white dark:bg-[#25213b] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860] transition-colors flex-shrink-0"
+              type="button"
+              aria-label="Уведомления"
+              title="Уведомления"
+            >
+              <img src="/bell.svg" alt="Уведомления" className="w-5 h-5 sm:w-6 sm:h-6 dark:brightness-200" />
+            </button>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </div>
         )}
         <button
           onClick={() => setDarkMode(!darkMode)}

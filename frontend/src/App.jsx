@@ -78,12 +78,19 @@ function UserCatalog({ products, categories, darkMode, setDarkMode, user, onLogo
             {user ? (
               <>
                 <span className="hidden sm:inline font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">{user.username}</span>
-                <button
-                  onClick={() => setShowNotifications(true)}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
-                >
-                  <img src="/bell.svg" alt="Уведомления" className="w-4 h-4 sm:w-5 sm:h-5 dark:brightness-200" />
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(true)}
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
+                  >
+                    <img src="/bell.svg" alt="Уведомления" className="w-4 h-4 sm:w-5 sm:h-5 dark:brightness-200" />
+                  </button>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </div>
                 <button
                   onClick={() => setDarkMode(!darkMode)}
                   className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"

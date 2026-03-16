@@ -12,6 +12,14 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
     description: ''
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const priceNum = parseFloat(formData.price) || 0;
+    const qtyNum = parseFloat(formData.quantity) || 0;
+    const discNum = parseFloat(formData.discountPercent) || 0;
+    setTotal(priceNum * qtyNum * (1 - discNum / 100));
+  }, [formData.price, formData.quantity, formData.discountPercent, formData.hasDiscount]);
 
   useEffect(() => {
     if (product) {
@@ -25,7 +33,6 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
         discountPercent: product.discount_percent || 0,
         description: product.description || ''
       });
-      // Загружаем существующее изображение как превью при редактировании
       if (product.image) {
         setImagePreview(product.image);
       }
@@ -54,10 +61,20 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
       newValue = Math.min(100, Math.max(0, num));
     }
     
-    setFormData(prev => ({
-      ...prev,
-      [name]: newValue
-    }));
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [name]: newValue
+      };
+      
+      // Recalculate total
+      const priceNum = parseFloat(updated.price) || 0;
+      const qtyNum = parseFloat(updated.quantity) || 0;
+      const discNum = parseFloat(updated.discountPercent || updated.hasDiscount ? (updated.discountPercent || 0) : 0) || 0;
+      setTotal(priceNum * qtyNum * (1 - discNum / 100));
+      
+      return updated;
+    });
   };
 
   const handleImageChange = (e) => {
@@ -225,6 +242,25 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
                     </div>
                   </div>
                 )}
+              </div>
+              </div>
+
+            {/* Total Sum Display */}
+            <div className="md:col-span-2 p-4 bg-gradient-to-r from-[#6d5bd0]/5 to-[#6d5bd0]/10 rounded-2xl border-2 border-[#6d5bd0]/20 backdrop-blur-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">Итого сумма:</p>
+                  <p className="font-['Inter'] font-bold text-[24px] sm:text-[28px] text-[#6d5bd0]">
+                    ${total?.toFixed(2) || '0.00'}
+                  </p>
+                  <p className="font-['Inter'] text-[12px] text-[#8b83ba] dark:text-[#6e6893]">
+                    {formData.quantity || 0} {formData.unit || 'шт'} × ${formData.price || 0}
+                    {hasDiscount && ` × (1 - ${(formData.discountPercent || 0).toString()}%)`}
+                  </p>
+                </div>
+                <div className="text-xs bg-white/80 dark:bg-[#25213b]/80 px-3 py-1 rounded-full font-['Inter'] text-[#6e6893] dark:text-[#b8b3d4]">
+                  Обновляется автоматически
+                </div>
               </div>
             </div>
 
