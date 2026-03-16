@@ -98,7 +98,7 @@ await fetch(`${API_URL}/api/notifications/${id}/mark_read/`, {
   const markAllAsRead = async () => {
     const token = localStorage.getItem('token');
     try {
-      await fetch(`${API_URL}/api/notifications/mark_all_read_/`, {
+await fetch(`${API_URL}/api/notifications/mark_all_read/`, {
         method: 'POST',
         headers: { 'Authorization': `Token ${token}` }
       });
