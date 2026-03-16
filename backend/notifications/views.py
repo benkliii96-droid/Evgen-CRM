@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import Notification
 from .serializers import NotificationSerializer
 from users.authentication import TokenAuthentication
+from requests.models import ProductRequest, CategoryRequest
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
@@ -57,3 +58,18 @@ class NotificationViewSet(viewsets.ModelViewSet):
         else:
             Notification.objects.filter(user=user).delete()
         return Response({'status': 'ok'})
+
+    @action(detail=False, methods=['get'])
+    def pending_requests(self, request):
+        """Получить количество необработанных заявок (для админа)"""
+        if not request.user.is_admin:
+            return Response({'error': 'Нет прав'}, status=status.HTTP_403_FORBIDDEN)
+        
+        product_count = ProductRequest.objects.filter(status='pending').count()
+        category_count = CategoryRequest.objects.filter(status='pending').count()
+        
+        return Response({
+            'product_requests': product_count,
+            'category_requests': category_count,
+            'total': product_count + category_count
+        })

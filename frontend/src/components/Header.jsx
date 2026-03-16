@@ -1,5 +1,32 @@
+import { useState, useEffect } from 'react';
+
+const API_URL = '';
+
 export function Header({ totalCost, darkMode, setDarkMode, user, onLogout, onNotificationsClick }) {
-  const isAdmin = user?.role === 'admin' || user?.is_admin
+  const isAdmin = user?.role === 'admin' || user?.is_admin;
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      fetchUnreadCount();
+      const interval = setInterval(fetchUnreadCount, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const fetchUnreadCount = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/notifications/unread_count/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      const data = await res.json();
+      setUnreadCount(data.unread_count || 0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   
   return (
     <div className="flex items-center justify-between gap-3 mb-4 md:mb-6">
@@ -12,7 +39,9 @@ export function Header({ totalCost, darkMode, setDarkMode, user, onLogout, onNot
             href="/admin/"
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#6d5bd0] text-white font-['Inter'] text-[12px] md:text-[13px] font-medium hover:bg-[#5d4bc0] transition-colors"
           >
-            <img src="./Key.svg" alt="Админ" className="w-4 h-4" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
             <span className="hidden sm:inline">Админ</span>
           </a>
         )}
@@ -30,9 +59,9 @@ export function Header({ totalCost, darkMode, setDarkMode, user, onLogout, onNot
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
             </button>
-            {false && (
+            {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                0
+                {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}
           </div>

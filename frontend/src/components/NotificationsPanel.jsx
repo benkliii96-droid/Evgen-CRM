@@ -2,17 +2,50 @@ import { useState, useEffect } from 'react';
 
 const API_URL = '';
 
-export function NotificationsPanel({ darkMode, onClose, user }) {
+export function NotificationsPanel({ darkMode, onClose, user, isAdmin = false }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [productRequests, setProductRequests] = useState([]);
+  const [categoryRequests, setCategoryRequests] = useState([]);
 
   useEffect(() => {
-    fetchNotifications();
+    if (isAdmin) {
+      fetchPendingRequests();
+    } else {
+      fetchNotifications();
+    }
     // Опрос каждую минуту
-    const interval = setInterval(fetchNotifications, 60000);
+    const interval = setInterval(isAdmin ? fetchPendingRequests : fetchNotifications, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAdmin]);
+
+  const fetchPendingRequests = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const [prodRes, catRes] = await Promise.all([
+        fetch(`${API_URL}/api/requests/products/?status=pending`, {
+          headers: { 'Authorization': `Token ${token}` }
+        }),
+        fetch(`${API_URL}/api/requests/categories/?status=pending`, {
+          headers: { 'Authorization': `Token ${token}` }
+        })
+      ]);
+
+      const prodData = await prodRes.json();
+      const catData = await catRes.json();
+
+      setProductRequests(prodData.results || prodData);
+      setCategoryRequests(catData.results || catData);
+      setUnreadCount((prodData.results?.length || prodData.length || 0) + (catData.results?.length || catData.length || 0));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchNotifications = async () => {
     const token = localStorage.getItem('token');
@@ -84,6 +117,161 @@ export function NotificationsPanel({ darkMode, onClose, user }) {
     if (days < 7) return `${days} дн. назад`;
     return date.toLocaleDateString('ru-RU');
   };
+
+  const getRequestStatusBadge = (status) => {
+    switch (status) {
+      case 'pending':
+        return <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs px-2 py-1 rounded-full font-['Inter']">На рассмотрении</span>;
+      case 'approved':
+        return <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs px-2 py-1 rounded-full font-['Inter']">Одобрено</span>;
+      case 'rejected':
+        return <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs px-2 py-1 rounded-full font-['Inter']">Отклонено</span>;
+      default:
+        return null;
+    }
+  };
+
+  const handleApprove = async (type, id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const endpoint = type === 'product' 
+        ? `${API_URL}/api/requests/products/${id}/approve/`
+        : `${API_URL}/api/requests/categories/${id}/approve/`;
+      
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      
+      // Обновить список
+      fetchPendingRequests();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleReject = async (type, id) => {
+    const token = localStorage.getItem('token');
+    const comment = prompt('Введите комментарий (причина отклонения):');
+    if (comment === null) return;
+    
+    try {
+      const endpoint = type === 'product'
+        ? `${API_URL}/api/requests/products/${id}/reject/`
+        : `${API_URL}/api/requests/categories/${id}/reject/`;
+      
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ comment })
+      });
+      
+      // Обновить список
+      fetchPendingRequests();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Если админ - показываем заявки
+  if (isAdmin) {
+    const allRequests = [
+      ...productRequests.map(r => ({ ...r, type: 'product' })),
+      ...categoryRequests.map(r => ({ ...r, type: 'category' }))
+    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="bg-white dark:bg-[#25213b] rounded-2xl w-full max-w-[600px] max-h-[80vh] overflow-hidden flex flex-col">
+          {/* Header */}
+          <div className="p-4 md:p-6 border-b border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white">
+                Заявки
+              </h2>
+              {unreadCount > 0 && (
+                <span className="bg-[#f59e0b] text-white text-xs px-2 py-1 rounded-full font-['Inter'] font-medium">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="w-10 h-10 rounded-xl hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] flex items-center justify-center"
+            >
+              <svg className="w-5 h-5 text-[#6e6893] dark:text-[#b8b3d4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* List */}
+          <div className="flex-1 overflow-y-auto">
+            {loading ? (
+              <div className="p-8 text-center text-[#6e6893] dark:text-[#b8b3d4] font-['Inter']">
+                Загрузка...
+              </div>
+            ) : allRequests.length === 0 ? (
+              <div className="p-8 text-center text-[#6e6893] dark:text-[#b8b3d4] font-['Inter']">
+                Нет новых заявок
+              </div>
+            ) : (
+              <div className="divide-y divide-[#e8e4ff] dark:divide-[#3d3860]">
+                {allRequests.map(req => (
+                  <div key={`${req.type}-${req.id}`} className="p-4 hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] transition-colors">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full font-['Inter'] ${
+                          req.type === 'product' 
+                            ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' 
+                            : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                        }`}>
+                          {req.type === 'product' ? 'Товар' : 'Категория'}
+                        </span>
+                        {getRequestStatusBadge(req.status)}
+                      </div>
+                      <span className="font-['Inter'] text-[12px] text-[#8b83ba] dark:text-[#6e6893]">
+                        {formatDate(req.created_at)}
+                      </span>
+                    </div>
+                    <h3 className="font-['Inter'] font-semibold text-[14px] text-[#25213b] dark:text-white mb-1">
+                      {req.name}
+                    </h3>
+                    <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
+                      От: {req.user_username || req.user?.username || 'Неизвестно'}
+                      {req.category_name && ` • ${req.category_name}`}
+                    </p>
+                    {req.type === 'product' && (
+                      <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-3">
+                        Цена: {req.price} ₽ • Кол-во: {req.quantity} {req.unit}
+                      </p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleApprove(req.type, req.id)}
+                        className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-['Inter'] font-medium transition-colors"
+                      >
+                        Одобрить
+                      </button>
+                      <button
+                        onClick={() => handleReject(req.type, req.id)}
+                        className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-['Inter'] font-medium transition-colors"
+                      >
+                        Отклонить
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const getTypeIcon = (type) => {
     switch (type) {

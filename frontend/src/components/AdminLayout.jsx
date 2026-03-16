@@ -1,8 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NotificationsPanel } from './NotificationsPanel';
+
+const API_URL = '';
 
 export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children }) {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  
+  const isAdmin = user?.is_admin || user?.role === 'admin';
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchPendingCount();
+      const interval = setInterval(fetchPendingCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAdmin]);
+
+  const fetchPendingCount = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/notifications/pending_requests/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      const data = await res.json();
+      setPendingCount(data.total || 0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   
   return (
     <div className="min-h-screen bg-[#f2f0f9] dark:bg-[#1a1625]">
@@ -21,17 +48,21 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(true)}
-                className="w-10 h-10 rounded-xl bg-[#f8f7ff] dark:bg-[#2d2847] border border-[#e8e4ff] dark:border-[#3d3860] flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]"
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-colors ${
+                  pendingCount > 0 
+                    ? 'bg-[#fef3c7] dark:bg-[#451a03] border-[#f59e0b] dark:border-[#d97706]' 
+                    : 'bg-[#f8f7ff] dark:bg-[#2d2847] border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]'
+                }`}
                 title="Уведомления"
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 dark:brightness-200 text-[#6e6893] dark:text-[#b8b3d4]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-5 h-5 dark:brightness-200 ${pendingCount > 0 ? 'text-[#d97706] dark:text-[#fbbf24]' : 'text-[#6e6893] dark:text-[#b8b3d4]'}`}>
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
               </button>
-              {false && (
+              {pendingCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  0
+                  {pendingCount}
                 </span>
               )}
             </div>
@@ -103,6 +134,7 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
           darkMode={darkMode}
           onClose={() => setShowNotifications(false)}
           user={user}
+          isAdmin={isAdmin}
         />
       )}
     </div>

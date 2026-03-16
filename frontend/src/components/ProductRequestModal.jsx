@@ -18,6 +18,7 @@ export function ProductRequestModal({ categories, onClose, onError }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     setFormData(prev => ({
@@ -25,6 +26,13 @@ export function ProductRequestModal({ categories, onClose, onError }) {
       category: categories?.[0]?.id || ''
     }));
   }, [categories]);
+
+  useEffect(() => {
+    const priceNum = parseFloat(formData.price) || 0;
+    const qtyNum = parseFloat(formData.quantity) || 0;
+    const discNum = formData.hasDiscount ? (parseFloat(formData.discountPercent) || 0) : 0;
+    setTotal(priceNum * qtyNum * (1 - discNum / 100));
+  }, [formData.price, formData.quantity, formData.discountPercent, formData.hasDiscount]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -388,7 +396,23 @@ export function ProductRequestModal({ categories, onClose, onError }) {
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            {/* Total */}
+            <div className="p-4 bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl border border-[#e8e4ff] dark:border-[#3d3860]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">Итого</p>
+                  <p className="font-['Inter'] text-[12px] text-[#8b83ba] dark:text-[#6e6893]">
+                    {formData.quantity || 0} × ${formData.price || 0}
+                    {hasDiscount && formData.discountPercent > 0 && ` × ${100 - formData.discountPercent}%`}
+                  </p>
+                </div>
+                <p className="font-['Inter'] font-bold text-[24px] text-[#6d5bd0]">
+                  ${total.toFixed(2)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
               <button
                 type="button"
                 onClick={onClose}

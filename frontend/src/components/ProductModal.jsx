@@ -14,10 +14,10 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
   const [imagePreview, setImagePreview] = useState(null);
   const [total, setTotal] = useState(0);
 
-  useEffect(() => {
+useEffect(() => {
     const priceNum = parseFloat(formData.price) || 0;
     const qtyNum = parseFloat(formData.quantity) || 0;
-    const discNum = parseFloat(formData.discountPercent) || 0;
+    const discNum = formData.hasDiscount ? (parseFloat(formData.discountPercent) || 0) : 0;
     setTotal(priceNum * qtyNum * (1 - discNum / 100));
   }, [formData.price, formData.quantity, formData.discountPercent, formData.hasDiscount]);
 
@@ -124,16 +124,16 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white dark:bg-[#25213b] rounded-2xl w-full max-w-[720px] max-h-[90vh] overflow-y-auto">
-        <div className="p-4 md:p-6">
-          <h2 className="font-['Inter'] font-bold text-[20px] md:text-[24px] text-[#25213b] dark:text-white mb-4 md:mb-6">
+      <div className="bg-white dark:bg-[#25213b] rounded-2xl w-full max-w-[640px] max-h-[90vh] overflow-y-auto">
+        <div className="p-4 md:p-5">
+          <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white mb-4">
             {product ? 'Редактировать товар' : 'Добавить товар'}
           </h2>
           
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
+                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-1.5">
                   Наименование *
                 </label>
                 <input
@@ -141,20 +141,20 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[44px] md:h-[48px] rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[40px] rounded-xl px-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
+                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-1.5">
                   Категория *
                 </label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[44px] md:h-[48px] rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[40px] rounded-xl px-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
                   required
                 >
                   {categories?.map(cat => (
@@ -162,16 +162,47 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
                   ))}
                 </select>
               </div>
+            </div>
 
+            <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                  Единица измерения
+                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-1.5">
+                  Кол-во *
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  min="1"
+                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[40px] rounded-xl px-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-1.5">
+                  Цена ($) *
+                </label>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  min="0.01"
+                  step="0.01"
+                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[40px] rounded-xl px-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-1.5">
+                  Ед. изм.
                 </label>
                 <select
                   name="unit"
                   value={formData.unit}
                   onChange={handleChange}
-                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[44px] md:h-[48px] rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
+                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[40px] rounded-xl px-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
                 >
                   <option value="шт">Штук</option>
                   <option value="кг">Килограмм</option>
@@ -180,172 +211,95 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
                   <option value="упак">Упаковка</option>
                 </select>
               </div>
+            </div>
 
-              <div className="space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      name="hasDiscount"
-                      checked={hasDiscount}
-                      onChange={handleChange}
-                      className="peer sr-only"
-                    />
-                    <div className="w-6 h-6 rounded-md border-2 border-[#e8e4ff] dark:border-[#3d3860] peer-checked:bg-[#6d5bd0] peer-checked:border-[#6d5bd0] transition-colors flex items-center justify-center">
-                      {hasDiscount && (
-                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                  <span className="font-['Inter'] text-[14px] text-[#25213b] dark:text-white">Есть скидка</span>
-                </label>
-                
-                {hasDiscount && (
-                  <div className="bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl p-4 border border-[#e8e4ff] dark:border-[#3d3860]">
-                    {/* Кнопки быстрого выбора */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {[5, 10, 15, 20, 25, 30, 50].map(val => (
-                        <button
-                          key={val}
-                          type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, discountPercent: val }))}
-                          className={`px-3 py-1.5 rounded-lg font-['Inter'] text-[13px] transition-colors ${
-                            formData.discountPercent === val
-                              ? 'bg-[#6d5bd0] text-white'
-                              : 'bg-white dark:bg-[#25213b] text-[#6e6893] border border-[#e8e4ff] dark:border-[#3d3860] hover:border-[#6d5bd0]'
-                          }`}
-                        >
-                          -{val}%
-                        </button>
-                      ))}
-                    </div>
-                    
-                    {/* Ползунок */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="font-['Inter'] text-[13px] text-[#6e6893]">Скидка: {formData.discountPercent || 0}%</span>
-                        <span className="font-['Inter'] font-bold text-[16px] text-[#6d5bd0]">
-                          -{(formData.discountPercent || 0)}%
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        name="discountPercent"
-                        value={formData.discountPercent || 0}
-                        onChange={handleChange}
-                        min="1"
-                        max="100"
-                        className="w-full h-2 bg-[#e8e4ff] dark:bg-[#3d3860] rounded-lg appearance-none cursor-pointer accent-[#6d5bd0]"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-              </div>
-
-            {/* Total Sum Display */}
-            <div className="md:col-span-2 p-4 bg-gradient-to-r from-[#6d5bd0]/5 to-[#6d5bd0]/10 rounded-2xl border-2 border-[#6d5bd0]/20 backdrop-blur-sm">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            {/* Total */}
+            <div className="p-3 bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl border border-[#e8e4ff] dark:border-[#3d3860]">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">Итого сумма:</p>
-                  <p className="font-['Inter'] font-bold text-[24px] sm:text-[28px] text-[#6d5bd0]">
-                    ${total?.toFixed(2) || '0.00'}
-                  </p>
-                  <p className="font-['Inter'] text-[12px] text-[#8b83ba] dark:text-[#6e6893]">
-                    {formData.quantity || 0} {formData.unit || 'шт'} × ${formData.price || 0}
-                    {hasDiscount && ` × (1 - ${(formData.discountPercent || 0).toString()}%)`}
+                  <p className="font-['Inter'] text-[12px] text-[#6e6893] dark:text-[#b8b3d4]">Итого</p>
+                  <p className="font-['Inter'] text-[11px] text-[#8b83ba] dark:text-[#6e6893]">
+                    {formData.quantity || 0} × ${formData.price || 0}
+                    {hasDiscount && formData.discountPercent > 0 && ` × ${100 - formData.discountPercent}%`}
                   </p>
                 </div>
-                <div className="text-xs bg-white/80 dark:bg-[#25213b]/80 px-3 py-1 rounded-full font-['Inter'] text-[#6e6893] dark:text-[#b8b3d4]">
-                  Обновляется автоматически
-                </div>
+                <p className="font-['Inter'] font-bold text-[22px] text-[#6d5bd0]">
+                  ${total.toFixed(2)}
+                </p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                  Описание
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows="3"
-                  className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl px-4 py-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0] resize-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                    Количество *
-                  </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="hasDiscount"
+                checked={hasDiscount}
+                onChange={handleChange}
+                id="hasDiscount"
+                className="w-4 h-4 rounded accent-[#6d5bd0]"
+              />
+              <label htmlFor="hasDiscount" className="font-['Inter'] text-[13px] text-[#25213b] dark:text-white cursor-pointer">
+                Есть скидка
+              </label>
+              {hasDiscount && (
+                <div className="flex items-center gap-2 ml-auto">
                   <input
                     type="number"
-                    name="quantity"
-                    value={formData.quantity}
+                    name="discountPercent"
+                    value={formData.discountPercent}
                     onChange={handleChange}
                     min="1"
-                    className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[44px] md:h-[48px] rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
-                    required
+                    max="100"
+                    className="w-16 bg-[#f8f7ff] dark:bg-[#2d2847] h-[32px] rounded-lg px-2 font-['Inter'] text-[13px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
                   />
+                  <span className="font-['Inter'] text-[13px] text-[#6e6893]">%</span>
                 </div>
-                <div>
-                  <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                    Цена ($) *
-                  </label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    min="0.01"
-                    step="0.01"
-                    className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[44px] md:h-[48px] rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0]"
-                    required
-                  />
-                </div>
-              </div>
+              )}
+            </div>
 
-              <div>
-                <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                  Изображение (макс. 1МБ)
+            <div>
+              <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-1.5">
+                Описание
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="2"
+                className="w-full bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl px-3 py-2 font-['Inter'] text-[13px] text-[#25213b] dark:text-white border border-[#e8e4ff] dark:border-[#3d3860] outline-none focus:border-[#6d5bd0] resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-1.5">
+                Изображение (макс. 1МБ)
+              </label>
+              <div className="flex items-center gap-2">
+                <label className="cursor-pointer bg-[#f8f7ff] dark:bg-[#2d2847] h-[36px] px-3 rounded-lg flex items-center border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f4f2ff]">
+                  <span className="font-['Inter'] text-[12px] text-[#6e6893]">Выбрать</span>
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
-                <div className="flex items-center gap-3">
-                  <label className="cursor-pointer bg-[#f8f7ff] dark:bg-[#2d2847] h-[44px] px-4 rounded-xl flex items-center border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860]">
-                    <span className="font-['Inter'] text-[13px] text-[#6e6893]">Выбрать</span>
-                    <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-                  </label>
-                  {showPreview && (
-                    <div className="relative group">
-                      <img 
-                        src={imagePreview || product?.image} 
-                        alt="Preview" 
-                        className="w-24 h-24 rounded-xl object-cover border-2 border-[#6d5bd0] shadow-md" 
-                      />
-                      <div className="absolute inset-0 bg-black/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white text-xs font-['Inter']">Превью</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {showPreview && (
+                  <img 
+                    src={imagePreview || product?.image} 
+                    alt="Preview" 
+                    className="w-12 h-12 rounded-lg object-cover border border-[#6d5bd0]" 
+                  />
+                )}
               </div>
             </div>
 
-            <div className="md:col-span-2 flex gap-3 pt-4">
+            <div className="flex gap-2 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 h-[48px] rounded-xl border border-[#e8e4ff] dark:border-[#3d3860] font-['Inter'] font-semibold text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847]"
+                className="flex-1 h-[40px] rounded-xl border border-[#e8e4ff] dark:border-[#3d3860] font-['Inter'] font-semibold text-[13px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847]"
               >
                 Отмена
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-[#6d5bd0] h-[48px] rounded-xl font-['Inter'] font-semibold text-[14px] text-white hover:bg-[#5d4bc0]"
+                className="flex-1 bg-[#6d5bd0] h-[40px] rounded-xl font-['Inter'] font-semibold text-[13px] text-white hover:bg-[#5d4bc0]"
               >
                 Сохранить
               </button>
