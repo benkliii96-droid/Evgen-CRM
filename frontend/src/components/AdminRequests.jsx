@@ -131,7 +131,7 @@ fetch(`${API_URL}/api/requests/categories/`, { headers: { 'Authorization': `Toke
               : 'bg-white dark:bg-[#25213b] text-[#6e6893] dark:text-[#b8b3d4] border border-[#e8e4ff] dark:border-[#3d3860]'
           }`}
         >
-          {selectedProductRequests.length || productRequests.filter(r => r.status === 'pending').length})
+          Товары ({productRequests.filter(r => r.status === 'pending').length})
         </button>
         <button
           onClick={() => setActiveTab('categories')}

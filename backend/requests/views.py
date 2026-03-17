@@ -73,20 +73,27 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         # Преобразуем строку единицы измерения в объект Unit
         unit_obj = None
         if product_request.unit:
-            unit_obj = Unit.objects.filter(short_name=product_request.unit, is_active=True).first()
-        
-        Product.objects.create(
-            name=product_request.name,
-            category=product_request.category,
-            unit=unit_obj,
-            quantity=product_request.quantity,
-            price=product_request.price,
-            has_discount=product_request.has_discount,
-            discount_percent=product_request.discount_percent,
-            description=product_request.description,
-            image=product_request.image
-        )
-        
+            try:
+                unit_obj = Unit.objects.filter(short_name=product_request.unit, is_active=True).first()
+            except Exception as e:
+                print(f"Error finding unit: {e}")
+                unit_obj = None
+            
+        try:
+            Product.objects.create(
+                name=product_request.name,
+                category=product_request.category,
+                unit=unit_obj,
+                quantity=product_request.quantity,
+                price=product_request.price,
+                has_discount=product_request.has_discount,
+                discount_percent=product_request.discount_percent,
+                description=product_request.description,
+                image=product_request.image
+            )
+        except Exception as e:
+            return Response({'error': f'Ошибка при создании товара: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         product_request.status = 'approved'
         product_request.save()
         
@@ -133,32 +140,40 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
             # Преобразуем строку единицы измерения в объект Unit
             unit_obj = None
             if product_request.unit:
-                unit_obj = Unit.objects.filter(short_name=product_request.unit, is_active=True).first()
+                try:
+                    unit_obj = Unit.objects.filter(short_name=product_request.unit, is_active=True).first()
+                except Exception as e:
+                    print(f"Error finding unit: {e}")
+                    unit_obj = None
             
-            Product.objects.create(
-                name=product_request.name,
-                category=product_request.category,
-                unit=unit_obj,
-                quantity=product_request.quantity,
-                price=product_request.price,
-                has_discount=product_request.has_discount,
-                discount_percent=product_request.discount_percent,
-                description=product_request.description,
-                image=product_request.image
-            )
-            
-            product_request.status = 'approved'
-            product_request.save()
-            
-            notify_product_approved(product_request)
-            approved_count += 1
+            try:
+                Product.objects.create(
+                    name=product_request.name,
+                    category=product_request.category,
+                    unit=unit_obj,
+                    quantity=product_request.quantity,
+                    price=product_request.price,
+                    has_discount=product_request.has_discount,
+                    discount_percent=product_request.discount_percent,
+                    description=product_request.description,
+                    image=product_request.image
+                )
+                
+                product_request.status = 'approved'
+                product_request.save()
+                
+                notify_product_approved(product_request)
+                approved_count += 1
+            except Exception as e:
+                print(f"Error approving request {product_request.id}: {e}")
+                continue
         
         return Response({
             'status': 'approved',
             'approved_count': approved_count,
             'failed_count': len(ids) - approved_count
         })
-    
+
     @action(detail=False, methods=['post'])
     def bulk_reject(self, request):
         """Массовое отклонение заявок"""
