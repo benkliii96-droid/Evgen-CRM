@@ -176,6 +176,15 @@ class CategorySerializer(serializers.ModelSerializer):
         return CategoryListSerializer(children, many=True).data
 
 
+class CategoryWithUnitsSerializer(serializers.ModelSerializer):
+    """Category + allowed_units for frontend dropdowns"""
+    allowed_units = CategoryUnitSerializer(source='allowed_units', many=True, read_only=True)
+    
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug', 'allowed_units']
+
+
 class CategoryListSerializer(serializers.ModelSerializer):
     """Компактный сериализатор для списков (без полей)"""
     products_count = serializers.SerializerMethodField()

@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
 
 class UnitGroup(models.Model):
@@ -281,6 +282,7 @@ class ProductFieldValue(models.Model):
 
 class Product(models.Model):
     name = models.CharField('Наименование', max_length=200)
+    slug = models.SlugField('URL-идентификатор', max_length=100, blank=True, unique=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория', related_name='products')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name='Добавил', related_name='products', null=True, blank=True)
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT, verbose_name='Единица измерения', related_name='products', null=True, blank=True)
@@ -297,6 +299,11 @@ class Product(models.Model):
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
         ordering = ['-created_at']
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.name

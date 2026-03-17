@@ -3,109 +3,30 @@ import { useState } from 'react';
 const API_URL = '';
 
 export function CategoryRequestModal({ onClose }) {
-  const [name, setName] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    if (!name || name.length < 2) {
-      setError('Название категории обязательно (мин. 2 символа)');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_URL}/api/requests/categories/`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`
-        },
-        body: JSON.stringify({ name })
-      });
-      
-      if (!res.ok) {
-        throw new Error('Ошибка отправки');
-      }
-      
-      setSuccess(true);
-      setTimeout(onClose, 2000);
-    } catch (err) {
-      setError('Ошибка отправки');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (success) {
-    return (
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-        <div className="bg-white dark:bg-[#25213b] rounded-2xl w-full max-w-[360px] p-6 text-center">
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-20 h-20 mx-auto mb-4">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-        </svg>
-          <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white mb-2">
-            Заявка отправлена
-          </h2>
-          <p className="font-['Inter'] text-[14px] text-[#6e6893] dark:text-[#b8b3d4]">
-            Ожидайте одобрения администратора
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white dark:bg-[#25213b] rounded-2xl w-full max-w-[400px] p-6">
-        <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white mb-4">
-          Предложить категорию
+      <div className="bg-white dark:bg-[#25213b] rounded-2xl w-full max-w-[420px] p-8 text-center max-h-[70vh] flex flex-col justify-center">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6e6893" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16 mx-auto mb-6 opacity-75">
+          <path d="M12 2v20M2 12h20"/>
+        </svg>
+        <h2 className="font-['Inter'] font-bold text-[20px] text-[#25213b] dark:text-white mb-3">
+          Добавление категорий отключено
         </h2>
-
-        {error && (
-          <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl mb-4 font-['Inter'] text-[14px]">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block font-['Inter'] font-medium text-[13px] text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-              Название категории *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => { setName(e.target.value); setError(''); }}
-              placeholder="Например: Бытовые приборы"
-              className={`w-full bg-[#f8f7ff] dark:bg-[#2d2847] h-[44px] rounded-xl px-4 font-['Inter'] text-[14px] text-[#25213b] dark:text-white border outline-none focus:border-[#6d5bd0] ${
-                error ? 'border-red-500' : 'border-[#e8e4ff] dark:border-[#3d3860]'
-              }`}
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 h-[48px] rounded-xl border border-[#e8e4ff] dark:border-[#3d3860] font-['Inter'] font-semibold text-[14px] text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847]"
-            >
-              Отмена
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-[#6d5bd0] h-[48px] rounded-xl font-['Inter'] font-semibold text-[14px] text-white hover:bg-[#5d4bc0] disabled:opacity-50"
-            >
-              {loading ? 'Отправка...' : 'Отправить'}
-            </button>
-          </div>
-        </form>
+        <p className="font-['Inter'] text-[15px] text-[#6e6893] dark:text-[#b8b3d4] mb-6 leading-relaxed">
+          Система содержит 15 стандартных категорий. 
+          <br/>
+          <span className="font-semibold text-[#6d5bd0]">Администраторы могут добавлять новые через панель управления.</span>
+        </p>
+        <div className="space-y-1 text-xs text-[#8b83ba] dark:text-[#6e6893] mb-6">
+          <p>👤 Только для администраторов</p>
+          <p>📱 login: admin / admin123</p>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full h-12 bg-gradient-to-r from-[#6d5bd0] to-[#5d4bc0] rounded-xl font-['Inter'] font-semibold text-base text-white hover:shadow-lg hover:shadow-[#6d5bd0]/25 transition-all"
+        >
+          Понятно
+        </button>
       </div>
     </div>
   );

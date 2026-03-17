@@ -8,7 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
 from users.models import User
-from products.models import Category, UnitGroup, Unit
+from products.models import Category, UnitGroup, Unit, CategoryUnit
 
 def create_initial_data():
     # Создаем админа
@@ -23,20 +23,32 @@ def create_initial_data():
     else:
         print('Админ уже существует')
     
-    # Создаем начальные категории
-    categories = [
-        'Техника для дома',
-        'Настольные игры',
-        'Электроника',
-        'Спорт',
-        'Книги',
-        'Игрушки'
+    # Создаем 15 стандартных категорий
+    categories_data = [
+        {'name': 'Смартфоны', 'sort_order': 1},
+        {'name': 'Ноутбуки', 'sort_order': 2},
+        {'name': 'Одежда', 'sort_order': 3},
+        {'name': 'Обувь', 'sort_order': 4},
+        {'name': 'Книги', 'sort_order': 5},
+        {'name': 'Игрушки', 'sort_order': 6},
+        {'name': 'Спорттовары', 'sort_order': 7},
+        {'name': 'Бытовая техника', 'sort_order': 8},
+        {'name': 'Автозапчасти', 'sort_order': 9},
+        {'name': 'Косметика', 'sort_order': 10},
+        {'name': 'Продукты питания', 'sort_order': 11},
+        {'name': 'Мебель', 'sort_order': 12},
+        {'name': 'Инструменты', 'sort_order': 13},
+        {'name': 'Ювелирные изделия', 'sort_order': 14},
+        {'name': 'Электроника', 'sort_order': 15},
     ]
     
-    for cat_name in categories:
-        category, created = Category.objects.get_or_create(name=cat_name)
+    for cat_data in categories_data:
+        category, created = Category.objects.get_or_create(
+            name=cat_data['name'],
+            defaults={'sort_order': cat_data['sort_order']}
+        )
         if created:
-            print(f'Создана категория: {cat_name}')
+            print(f'Создана категория: {category.name}')
     
     # Создаем группы единиц измерения
     unit_groups = [
@@ -92,8 +104,70 @@ def create_initial_data():
         except UnitGroup.DoesNotExist:
             print(f'Группа {group_slug} не найдена')
     
-    print('\nНачальные данные созданы!')
-    print('Админ: admin / admin123')
+    # Привязываем категории к единицам (CategoryUnit)
+    category_unit_data = [
+        # Смартфоны, Ноутбуки, Электроника → шт, упак
+        ('Смартфоны', 'шт', True),
+        ('Смартфоны', 'упак', False),
+        ('Ноутбуки', 'шт', True),
+        ('Электроника', 'шт', True),
+        
+        # Одежда, Обувь → пар, шт
+        ('Одежда', 'шт', True),
+        ('Одежда', 'пар', False),
+        ('Обувь', 'пар', True),
+        
+        # Книги, Игрушки → шт
+        ('Книги', 'шт', True),
+        ('Игрушки', 'шт', True),
+        
+        # Спорттовары → шт, набор
+        ('Спорттовары', 'шт', True),
+        ('Спорттовары', 'набор', False),
+        
+        # Бытовая техника → шт
+        ('Бытовая техника', 'шт', True),
+        
+        # Автозапчасти → шт, набор
+        ('Автозапчасти', 'шт', True),
+        ('Автозапчасти', 'набор', False),
+        
+        # Косметика, Продукты → шт, г, кг
+        ('Косметика', 'шт', True),
+        ('Продукты питания', 'шт', False),
+        ('Продукты питания', 'г', True),
+        ('Продукты питания', 'кг', False),
+        
+        # Мебель → шт
+        ('Мебель', 'шт', True),
+        
+        # Инструменты → шт, набор
+        ('Инструменты', 'шт', True),
+        ('Инструменты', 'набор', False),
+        
+        # Ювелирка → шт, г
+        ('Ювелирные изделия', 'шт', True),
+        ('Ювелирные изделия', 'г', False),
+    ]
+    
+    for cat_name, short_name, is_default in category_unit_data:
+        try:
+            category = Category.objects.get(name=cat_name)
+            unit = Unit.objects.get(short_name=short_name)
+            cat_unit, created = CategoryUnit.objects.get_or_create(
+                category=category,
+                unit=unit,
+                defaults={'is_default': is_default, 'sort_order': 0}
+            )
+            if created:
+                print(f'Привязана единица {short_name} к категории {cat_name}')
+        except (Category.DoesNotExist, Unit.DoesNotExist):
+            print(f'Пропущена привязка: категория {cat_name} или единица {short_name}')
+    
+    print('\n✅ Начальные данные созданы!')
+    print('👤 Админ: admin / admin123')
+    print('📱 API: /api/categories/?units=true')
 
 if __name__ == '__main__':
     create_initial_data()
+

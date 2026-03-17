@@ -70,7 +70,7 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         if product_request.status != 'pending':
             return Response({'error': 'Запрос уже обработан'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Преобразуем строку единицы измерения в объект Unit
+# Преобразуем строку единицы измерения в объект Unit
         unit_obj = None
         if product_request.unit:
             try:
@@ -78,6 +78,8 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
             except Exception as e:
                 print(f"Error finding unit: {e}")
                 unit_obj = None
+        if not unit_obj:
+            unit_obj = Unit.objects.filter(short_name='шт', is_active=True).first()
             
         try:
             Product.objects.create(
@@ -137,7 +139,7 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         approved_count = 0
         
         for product_request in pending_requests:
-            # Преобразуем строку единицы измерения в объект Unit
+# Преобразуем строку единицы измерения в объект Unit
             unit_obj = None
             if product_request.unit:
                 try:
@@ -145,6 +147,8 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
                 except Exception as e:
                     print(f"Error finding unit: {e}")
                     unit_obj = None
+            if not unit_obj:
+                unit_obj = Unit.objects.filter(short_name='шт', is_active=True).first()
             
             try:
                 Product.objects.create(

@@ -130,9 +130,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
+            if self.request.query_params.get('units') == 'true':
+                return CategoryWithUnitsSerializer
             # Проверяем, нужно ли дерево
-            request = self.request
-            if request.query_params.get('tree') == 'true':
+            if self.request.query_params.get('tree') == 'true':
                 return CategoryTreeSerializer
             return CategoryListSerializer
         return CategorySerializer
