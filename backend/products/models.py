@@ -102,6 +102,21 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            from django.utils.text import slugify
+            base_slug = slugify(self.name)
+            self.slug = base_slug
+            # Если слаг уже существует, добавляем число
+            from django.db import transaction
+            with transaction.atomic():
+                if Category.objects.filter(slug=self.slug).exists():
+                    counter = 1
+                    while Category.objects.filter(slug=f"{base_slug}-{counter}").exists():
+                        counter += 1
+                    self.slug = f"{base_slug}-{counter}"
+        super().save(*args, **kwargs)
+    
     @property
     def full_path(self):
         """Полный путь категории (для хлебных крошек)"""

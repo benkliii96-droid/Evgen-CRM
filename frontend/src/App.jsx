@@ -20,7 +20,6 @@ import { AdminUsers } from './components/AdminUsers';
 import { AdminProducts } from './components/AdminProducts';
 import { AdminRequests } from './components/AdminRequests';
 import { AdminCategories } from './components/AdminCategories';
-import { AdminUnits } from './components/AdminUnits';
 
 const API_URL = ''; // Пустой = относительный URL, работает и для HTTP и для HTTPS
 
@@ -542,8 +541,6 @@ function AdminPage() {
       return <AdminRequests />;
     } else if (path === '/categories' || path === '/categories/') {
       return <AdminCategories />;
-    } else if (path === '/units' || path === '/units/') {
-      return <AdminUnits />;
     }
     
     return <AdminDashboard stats={stats} />;

@@ -110,10 +110,14 @@ export function ProductRequestModal({ onClose, onError }) {
     try {
       const token = localStorage.getItem('token');
       
+      // Получаем short_name выбранной единицы
+      const selectedUnit = availableUnits.find(u => u.id == formData.unit);
+      const unitShortName = selectedUnit?.short_name || 'шт';
+      
       const data = {
         name: formData.name.trim(),
         category: parseInt(formData.category),
-        unit: formData.unit,
+        unit: unitShortName,
         quantity: parseInt(formData.quantity),
         price: parseFloat(formData.price),
         has_discount: formData.hasDiscount,

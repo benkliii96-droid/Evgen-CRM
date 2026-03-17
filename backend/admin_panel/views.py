@@ -179,12 +179,18 @@ def category_requests(request):
 @require_POST
 def approve_product_request(request, request_id):
     """Одобрение запроса на товар"""
+    from products.models import Unit
     pr = get_object_or_404(ProductRequest, id=request_id)
+    
+    # Преобразуем строку единицы в объект Unit
+    unit_obj = None
+    if pr.unit:
+        unit_obj = Unit.objects.filter(short_name=pr.unit, is_active=True).first()
     
     product = Product.objects.create(
         name=pr.name,
         category=pr.category,
-        unit=pr.unit,
+        unit=unit_obj,
         quantity=pr.quantity,
         price=pr.price,
         has_discount=pr.has_discount,
@@ -219,6 +225,7 @@ def approve_category_request(request, request_id):
     """Одобрение запроса на категорию"""
     cr = get_object_or_404(CategoryRequest, id=request_id)
     
+    # Слаг сгенерируется автоматически в save()
     category = Category.objects.create(name=cr.name)
     
     cr.status = 'approved'
