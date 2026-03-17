@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from products.models import Category, Product
+from products.models import Category, Product, Unit
 from .models import ProductRequest, CategoryRequest
 from .serializers import (
     ProductRequestSerializer, ProductRequestCreateSerializer, ProductRequestReviewSerializer,
@@ -70,10 +70,15 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         if product_request.status != 'pending':
             return Response({'error': 'Запрос уже обработан'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # Преобразуем строку единицы измерения в объект Unit
+        unit_obj = None
+        if product_request.unit:
+            unit_obj = Unit.objects.filter(short_name=product_request.unit, is_active=True).first()
+        
         Product.objects.create(
             name=product_request.name,
             category=product_request.category,
-            unit=product_request.unit,
+            unit=unit_obj,
             quantity=product_request.quantity,
             price=product_request.price,
             has_discount=product_request.has_discount,
@@ -125,10 +130,15 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         approved_count = 0
         
         for product_request in pending_requests:
+            # Преобразуем строку единицы измерения в объект Unit
+            unit_obj = None
+            if product_request.unit:
+                unit_obj = Unit.objects.filter(short_name=product_request.unit, is_active=True).first()
+            
             Product.objects.create(
                 name=product_request.name,
                 category=product_request.category,
-                unit=product_request.unit,
+                unit=unit_obj,
                 quantity=product_request.quantity,
                 price=product_request.price,
                 has_discount=product_request.has_discount,

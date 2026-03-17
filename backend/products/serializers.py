@@ -350,7 +350,18 @@ class ProductCreateSerializer(serializers.ModelSerializer):
                 except (ValueError, TypeError):
                     converted['price'] = 0.0
             elif key == 'unit':
-                converted['unit'] = value or 'шт'
+                # Если передан ID юнита - используем его, иначе ищем по short_name
+                if value:
+                    try:
+                        unit_id = int(value)
+                        converted['unit'] = unit_id
+                    except (ValueError, TypeError):
+                        # Это строка (short_name), нужно найти Unit
+                        from .models import Unit
+                        unit_obj = Unit.objects.filter(short_name=value, is_active=True).first()
+                        if unit_obj:
+                            converted['unit'] = unit_obj.id
+                        # Если не найден - не добавляем (оставим null)
             elif key == 'name':
                 converted['name'] = value.strip()
             elif key == 'description':

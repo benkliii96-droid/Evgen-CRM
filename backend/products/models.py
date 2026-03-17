@@ -80,7 +80,7 @@ class Unit(models.Model):
 
 class Category(models.Model):
     name = models.CharField('Название', max_length=100)
-    slug = models.SlugField('URL-идентификатор', max_length=100, unique=True)
+    slug = models.SlugField('URL-идентификатор', max_length=100, unique=True, null=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='Родительская категория', related_name='children', null=True, blank=True)
     icon = models.ImageField('Иконка', upload_to='categories/icons/', blank=True, null=True)
     description = models.TextField('Описание', blank=True)
@@ -214,7 +214,7 @@ class ProductField(models.Model):
     ]
     
     name = models.CharField('Название поля', max_length=100)
-    slug = models.SlugField('Идентификатор', max_length=100)
+    slug = models.SlugField('Идентификатор', max_length=100, null=True, blank=True)
     field_type = models.CharField('Тип поля', max_length=20, choices=FIELD_TYPES)
     description = models.TextField('Описание', blank=True)
     placeholder = models.CharField('Подсказка', max_length=200, blank=True)
@@ -244,7 +244,6 @@ class ProductField(models.Model):
         verbose_name = 'Поле товара'
         verbose_name_plural = 'Поля товаров'
         ordering = ['sort_order', 'name']
-        unique_together = ['slug', 'field_type']
     
     def __str__(self):
         return f"{self.name} ({self.get_field_type_display()})"
