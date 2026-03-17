@@ -138,6 +138,12 @@ export function ProductRequestModal({ onClose, onError }) {
       
       console.log('Response status:', res.status);
       
+      // Если токен невалидный - очищаем и просим войти
+      if (res.status === 403) {
+        localStorage.removeItem('token');
+        throw new Error('Сессия истекла. Войдите заново.');
+      }
+      
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.detail || errorData.error || `Ошибка сервера: ${res.status}`);
@@ -147,6 +153,11 @@ export function ProductRequestModal({ onClose, onError }) {
       setTimeout(onClose, 2000);
     } catch (err) {
       console.error('Submit error:', err);
+      // Если ошибка авторизации - перенаправляем на главную
+      if (err.message.includes('Сессия истекла') || err.message.includes('Неверный токен')) {
+        window.location.href = '/';
+        return;
+      }
       onError?.(err.message);
     } finally {
       setSubmitLoading(false);
