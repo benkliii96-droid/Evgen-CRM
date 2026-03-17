@@ -23,12 +23,15 @@ export function AdminProducts() {
     try {
       const [productsRes, categoriesRes] = await Promise.all([
         fetch(`${API_URL}/api/products/`, { headers: { 'Authorization': `Token ${token}` } }),
-        fetch(`${API_URL}/api/categories/`, { headers: { 'Authorization': `Token ${token}` } })
+        fetch(`${API_URL}/api/categories/`)
       ]);
-      setProducts(await productsRes.json());
-      setCategories(await categoriesRes.json());
+      const productsData = await productsRes.json();
+      const categoriesData = await categoriesRes.json();
+      console.log('Categories loaded:', categoriesData);
+      setProducts(productsData);
+      setCategories(categoriesData);
     } catch (err) {
-      console.error(err);
+      console.error('Error loading data:', err);
     } finally {
       setLoading(false);
     }

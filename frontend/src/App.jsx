@@ -488,7 +488,8 @@ function AdminPage() {
       }).catch(() => {});
     }
     localStorage.removeItem('token');
-    navigate('/');
+    // Полный переход на главную страницу с перезагрузкой
+    window.location.href = '/';
   };
 
   useEffect(() => {
