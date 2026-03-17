@@ -16,7 +16,7 @@ def create_initial_data():
         admin = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password='admin123',
+            password='05092007u',
             role='admin'
         )
         print(f'Создан админ: {admin.username} (пароль: admin123)')
