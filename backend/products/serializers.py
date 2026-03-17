@@ -178,7 +178,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CategoryWithUnitsSerializer(serializers.ModelSerializer):
     """Category + allowed_units for frontend dropdowns"""
-    allowed_units = CategoryUnitSerializer(source='allowed_units', many=True, read_only=True)
+    allowed_units = CategoryUnitSerializer(many=True, read_only=True)
     
     class Meta:
         model = Category

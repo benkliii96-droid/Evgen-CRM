@@ -254,20 +254,12 @@ const [unreadCount, setUnreadCount] = useState(0);
             ))}
           </select>
           {user && (
-            <div className="flex gap-2 sm:gap-3">
-              <button
-                onClick={() => setShowProductRequest(true)}
-                className="bg-[#6d5bd0] h-11 sm:h-12 px-3 sm:px-5 rounded-xl font-['Inter'] font-medium text-[12px] sm:text-[14px] text-white hover:bg-[#5d4bc0] whitespace-nowrap"
-              >
-                + Товар
-              </button>
-              <button
-                onClick={() => setShowCategoryRequest(true)}
-                className="bg-white dark:bg-[#25213b] h-11 sm:h-12 px-3 sm:px-5 rounded-xl font-['Inter'] font-medium text-[12px] sm:text-[14px] text-[#6d5bd0] border border-[#e8e4ff] dark:border-[#3d3860] hover:bg-[#f8f7ff] dark:hover:bg-[#2d2847] whitespace-nowrap"
-              >
-                + Категория
-              </button>
-            </div>
+            <button
+              onClick={() => setShowProductRequest(true)}
+              className="bg-[#6d5bd0] h-11 sm:h-12 px-3 sm:px-5 rounded-xl font-['Inter'] font-medium text-[12px] sm:text-[14px] text-white hover:bg-[#5d4bc0] whitespace-nowrap"
+            >
+              + Товар
+            </button>
           )}
         </div>
 

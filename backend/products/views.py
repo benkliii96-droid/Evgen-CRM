@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Category, Product, ProductField, ProductFieldValue, UnitGroup, Unit, CategoryUnit
 from .serializers import (
-    CategorySerializer, CategoryListSerializer, CategoryTreeSerializer,
+    CategorySerializer, CategoryListSerializer, CategoryTreeSerializer, CategoryWithUnitsSerializer,
     ProductSerializer, ProductListSerializer, ProductCreateSerializer,
     ProductFieldSerializer, ProductFieldValueSerializer,
     UnitGroupSerializer, UnitGroupListSerializer, UnitSerializer, UnitListSerializer,
