@@ -116,8 +116,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """ViewSet для категорий с поддержкой вложенности"""
     queryset = Category.objects.filter(is_active=True)
     serializer_class = CategorySerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = []  # Без аутентификации для чтения
+    permission_classes = [permissions.AllowAny]  # Разрешить всем
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'description']
     ordering_fields = ['sort_order', 'name', 'created_at']
@@ -225,8 +225,8 @@ class ProductFieldViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = []  # Без аутентификации для чтения
+    permission_classes = [permissions.AllowAny]  # Разрешить всем
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'has_discount']
     search_fields = ['name', 'category__name']
