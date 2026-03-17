@@ -20,6 +20,7 @@ export function AdminProducts() {
 
   const fetchData = async () => {
     const token = localStorage.getItem('token');
+    console.log('AdminProducts: fetchData started');
     try {
       const [productsRes, categoriesRes] = await Promise.all([
         fetch(`${API_URL}/api/products/`, { headers: { 'Authorization': `Token ${token}` } }),
@@ -27,11 +28,12 @@ export function AdminProducts() {
       ]);
       const productsData = await productsRes.json();
       const categoriesData = await categoriesRes.json();
-      console.log('Categories loaded:', categoriesData);
+      console.log('AdminProducts: Categories loaded:', categoriesData);
+      console.log('AdminProducts: Products loaded:', productsData.length);
       setProducts(productsData);
       setCategories(categoriesData);
     } catch (err) {
-      console.error('Error loading data:', err);
+      console.error('AdminProducts: Error loading data:', err);
     } finally {
       setLoading(false);
     }

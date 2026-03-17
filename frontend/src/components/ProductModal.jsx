@@ -3,6 +3,30 @@ import { useState, useEffect } from 'react';
 const API_URL = '';
 
 export function ProductModal({ product, categories, onClose, onSave, onError }) {
+  // Отладка
+  console.log('ProductModal received categories:', categories);
+  console.log('ProductModal categories length:', categories?.length);
+  console.log('ProductModal categories is array:', Array.isArray(categories));
+  
+  // Fallback категории если не загружены
+  const displayCategories = (categories && categories.length > 0) ? categories : [
+    { id: 1, name: 'Смартфоны' },
+    { id: 2, name: 'Ноутбуки' },
+    { id: 3, name: 'Одежда' },
+    { id: 4, name: 'Обувь' },
+    { id: 5, name: 'Книги' },
+    { id: 6, name: 'Игрушки' },
+    { id: 7, name: 'Спорттовары' },
+    { id: 8, name: 'Бытовая техника' },
+    { id: 9, name: 'Автозапчасти' },
+    { id: 10, name: 'Косметика' },
+    { id: 11, name: 'Продукты питания' },
+    { id: 12, name: 'Мебель' },
+    { id: 13, name: 'Инструменты' },
+    { id: 14, name: 'Ювелирные изделия' },
+    { id: 15, name: 'Электроника' }
+  ];
+  
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -69,7 +93,7 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
     } else {
       setFormData({
         name: '',
-        category: categories?.[0]?.id?.toString() || '',
+        category: displayCategories?.[0]?.id?.toString() || '',
         unit: '',
         quantity: '',
         price: '',
@@ -175,7 +199,7 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
                   required
                 >
                   <option value="">Выберите</option>
-                  {categories?.map(cat => (
+                  {displayCategories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>

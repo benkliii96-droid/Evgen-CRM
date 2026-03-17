@@ -22,12 +22,9 @@ export function ProductRequestModal({ onClose, onError }) {
   const [success, setSuccess] = useState(false);
   const [total, setTotal] = useState(0);
 
-  // Загрузка категорий с units
+  // Загрузка категорий с units (публичный эндпоинт)
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    fetch(`${API_URL}/api/categories/?units=true`, {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    fetch(`${API_URL}/api/categories/?units=true`)
       .then(res => res.json())
       .then(setCategories)
       .catch(err => console.error('Error loading categories:', err))
@@ -109,6 +106,11 @@ export function ProductRequestModal({ onClose, onError }) {
     setSubmitLoading(true);
     try {
       const token = localStorage.getItem('token');
+      console.log('Submitting request, token:', token ? 'present' : 'missing');
+      
+      if (!token) {
+        throw new Error('Вы не авторизованы. Войдите в систему.');
+      }
       
       // Получаем short_name выбранной единицы
       const selectedUnit = availableUnits.find(u => u.id == formData.unit);
@@ -134,15 +136,17 @@ export function ProductRequestModal({ onClose, onError }) {
         body: JSON.stringify(data)
       });
       
+      console.log('Response status:', res.status);
+      
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || errorData.error || 'Ошибка сервера');
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || errorData.error || `Ошибка сервера: ${res.status}`);
       }
       
       setSuccess(true);
       setTimeout(onClose, 2000);
     } catch (err) {
-      console.error(err);
+      console.error('Submit error:', err);
       onError?.(err.message);
     } finally {
       setSubmitLoading(false);
