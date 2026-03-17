@@ -35,37 +35,13 @@ def notify_product_rejected(product_request):
     )
 
 
-def notify_category_approved(category_request):
-    """Уведомить пользователя об одобрении категории"""
-    create_notification(
-        user=category_request.user,
-        notification_type='category_approved',
-        title='Ваша категория одобрена',
-        message=f'Категория "{category_request.name}" была одобрена и добавлена.',
-        related_id=category_request.id
-    )
-
-
-def notify_category_rejected(category_request):
-    """Уведомить пользователя об отклонении категории"""
-    comment = category_request.admin_comment or 'Причина не указана'
-    create_notification(
-        user=category_request.user,
-        notification_type='category_rejected',
-        title='Ваша категория отклонена',
-        message=f'Категория "{category_request.name}" была отклонена. Причина: {comment}',
-        related_id=category_request.id
-    )
-
-
 def notify_new_request(admin_user, request_type, request_name, request_id):
-    """Уведомить админа о новом запросе"""
-    # Находим всех админов
+    """Уведомить админа о новом запросе (только products)"""
     from users.models import User
     admins = User.objects.filter(role='admin')
     
     for admin in admins:
-        create_notification(
+        Notification.objects.create(
             user=admin,
             notification_type='new_request',
             title=f'Новый запрос на {request_type}',

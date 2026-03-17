@@ -6,8 +6,7 @@ class Notification(models.Model):
     TYPE_CHOICES = [
         ('product_approved', 'Товар одобрен'),
         ('product_rejected', 'Товар отклонён'),
-        ('category_approved', 'Категория одобрена'),
-        ('category_rejected', 'Категория отклонена'),
+
         ('new_request', 'Новый запрос'),
     ]
     

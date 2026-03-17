@@ -41,24 +41,4 @@ class ProductRequest(models.Model):
         return f"{self.name} от {self.user.username}"
 
 
-class CategoryRequest(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'На рассмотрении'),
-        ('approved', 'Одобрено'),
-        ('rejected', 'Отклонено'),
-    ]
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='category_requests')
-    name = models.CharField('Название категории', max_length=100)
-    status = models.CharField('Статус', max_length=10, choices=STATUS_CHOICES, default='pending')
-    admin_comment = models.TextField('Комментарий админа', blank=True)
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
-    
-    class Meta:
-        verbose_name = 'Запрос на добавление категории'
-        verbose_name_plural = 'Запросы на добавление категорий'
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        return f"{self.name} от {self.user.username}"
+

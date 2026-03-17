@@ -43,14 +43,14 @@ export function ProductRequestModal({ onClose, onError }) {
         setAvailableUnits(units);
         // Устанавливаем первую доступную единицу по умолчанию
         if (units.length > 0 && !formData.unit) {
-          setFormData(prev => ({ ...prev, unit: units[0].short_name }));
+          setFormData(prev => ({ ...prev, unit: units[0].id }));
         }
       } else {
         setAvailableUnits([]);
         setFormData(prev => ({ ...prev, unit: '' }));
       }
     }
-  }, [formData.category, categories]);
+  }, [formData.category, categories, formData.unit]);
 
   useEffect(() => {
     const priceNum = parseFloat(formData.price) || 0;
@@ -75,8 +75,6 @@ export function ProductRequestModal({ onClose, onError }) {
 
   const handleCategoryChange = (e) => {
     handleChange(e);
-    // Сбрасываем unit при смене категории
-    setFormData(prev => ({ ...prev, unit: '' }));
   };
 
   const handleImageChange = (e) => {
@@ -111,50 +109,37 @@ export function ProductRequestModal({ onClose, onError }) {
     setSubmitLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const hasImage = formData.image instanceof File;
       
-      if (hasImage) {
-        const fd = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-          if (key === 'image') {
-            if (value) fd.append(key, value);
-          } else if (value !== '') {
-            fd.append(key, value);
-          }
-        });
-        var res = await fetch(`${API_URL}/api/requests/products/`, {
-          method: 'POST',
-          headers: { 'Authorization': `Token ${token}` },
-          body: fd
-        });
-      } else {
-        const data = {
-          name: formData.name.trim(),
-          category: parseInt(formData.category),
-          unit: formData.unit,
-          quantity: parseInt(formData.quantity),
-          price: parseFloat(formData.price),
-          has_discount: formData.hasDiscount,
-          discount_percent: parseInt(formData.discountPercent),
-          description: formData.description.trim()
-        };
-        var res = await fetch(`${API_URL}/api/requests/products/`, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
-          },
-          body: JSON.stringify(data)
-        });
+      const data = {
+        name: formData.name.trim(),
+        category: parseInt(formData.category),
+        unit: formData.unit,
+        quantity: parseInt(formData.quantity),
+        price: parseFloat(formData.price),
+        has_discount: formData.hasDiscount,
+        discount_percent: parseInt(formData.discountPercent),
+        description: formData.description.trim()
+      };
+
+      const res = await fetch(`${API_URL}/api/requests/products/`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || errorData.error || 'Ошибка сервера');
       }
-      
-      if (!res.ok) throw new Error(await res.text());
       
       setSuccess(true);
       setTimeout(onClose, 2000);
     } catch (err) {
       console.error(err);
-      onError?.();
+      onError?.(err.message);
     } finally {
       setSubmitLoading(false);
     }
@@ -190,6 +175,7 @@ export function ProductRequestModal({ onClose, onError }) {
         <h2 className="font-['Inter'] font-bold text-2xl mb-6 text-[#25213b] dark:text-white">Предложить товар</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Наименование */}
           <div>
             <label className="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
               Наименование *
@@ -208,6 +194,7 @@ export function ProductRequestModal({ onClose, onError }) {
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
 
+          {/* Категория + Unit */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
@@ -248,7 +235,7 @@ export function ProductRequestModal({ onClose, onError }) {
               >
                 {availableUnits.length ? (
                   availableUnits.map(unit => (
-                    <option key={unit.id} value={unit.short_name}>
+                    <option key={unit.id} value={unit.id}>
                       {unit.name} ({unit.short_name})
                     </option>
                   ))
@@ -260,6 +247,7 @@ export function ProductRequestModal({ onClose, onError }) {
             </div>
           </div>
 
+          {/* Количество + Цена */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
@@ -281,7 +269,7 @@ export function ProductRequestModal({ onClose, onError }) {
             </div>
             <div>
               <label className="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
-                Цена ($)*
+                Цена *
               </label>
               <input
                 type="number"
@@ -292,7 +280,7 @@ export function ProductRequestModal({ onClose, onError }) {
                 step="0.01"
                 className={`w-full h-11 rounded-xl px-4 border outline-none focus:border-[#6d5bd0] font-['Inter'] text-base transition-colors ${
                   errors.price 
-                    ? 'bg-red-50 border-red-500 dark:bg-red-950/30 dark:border-red-500 text-red-900 dark:text-red-100' 
+                    ? 'bg-red-50 border-red-300 dark:bg-red-950/30 dark:border-red-500 text-red-900 dark:text-red-100' 
                     : 'bg-[#f8f7ff] dark:bg-[#2d2847] border-[#e8e4ff] dark:border-[#3d3860] text-[#25213b] dark:text-white'
                 }`}
               />
@@ -300,17 +288,18 @@ export function ProductRequestModal({ onClose, onError }) {
             </div>
           </div>
 
+          {/* Скидка */}
           <div>
             <label className="flex items-center gap-3 p-3 bg-[#f8f7ff]/50 dark:bg-[#2d2847]/50 rounded-xl cursor-pointer border border-[#e8e4ff]/50 dark:border-[#3d3860]/50 hover:border-[#6d5bd0]/50 transition-all">
               <input
                 type="checkbox"
                 name="hasDiscount"
-                checked={hasDiscount}
+                checked={formData.hasDiscount}
                 onChange={handleChange}
                 className="sr-only peer"
               />
               <div className="w-5 h-5 rounded border-2 border-[#e8e4ff] dark:border-[#3d3860] peer-checked:bg-[#6d5bd0] peer-checked:border-[#6d5bd0] flex items-center justify-center transition-all">
-                {hasDiscount && <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                {formData.hasDiscount && <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
                 </svg>}
               </div>
@@ -318,7 +307,7 @@ export function ProductRequestModal({ onClose, onError }) {
             </label>
           </div>
 
-          {hasDiscount && (
+          {formData.hasDiscount && (
             <div className="p-4 bg-gradient-to-r from-[#6d5bd0]/5 to-[#5d4bc0]/5 rounded-xl border border-[#6d5bd0]/20">
               <div className="flex justify-between items-center mb-4">
                 <span className="font-['Inter'] text-sm text-[#6e6893] dark:text-[#b8b3d4]">Скидка:</span>
@@ -352,6 +341,7 @@ export function ProductRequestModal({ onClose, onError }) {
             </div>
           )}
 
+          {/* Описание */}
           <div>
             <label className="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
               Описание
@@ -366,6 +356,7 @@ export function ProductRequestModal({ onClose, onError }) {
             />
           </div>
 
+          {/* Изображение */}
           <div>
             <label className="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
               Изображение (макс. 1 МБ)
@@ -394,6 +385,7 @@ export function ProductRequestModal({ onClose, onError }) {
             {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
           </div>
 
+          {/* Итого */}
           <div className="p-4 bg-gradient-to-r from-emerald-50/50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/30 rounded-xl border border-emerald-200/50 dark:border-emerald-800/50">
             <div className="flex justify-between items-start">
               <div>
@@ -409,6 +401,7 @@ export function ProductRequestModal({ onClose, onError }) {
             </div>
           </div>
 
+          {/* Кнопки */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"
@@ -419,7 +412,7 @@ export function ProductRequestModal({ onClose, onError }) {
             </button>
             <button
               type="submit"
-              disabled={submitLoading || loading}
+              disabled={submitLoading}
               className="flex-1 bg-gradient-to-r from-[#6d5bd0] to-[#5d4bc0] h-12 rounded-xl font-['Inter'] font-semibold text-base text-white shadow-lg hover:shadow-xl hover:from-[#5d4bc0] hover:to-[#4f419b] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitLoading ? 'Отправка...' : 'Отправить заявку'}

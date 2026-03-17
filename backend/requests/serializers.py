@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProductRequest, CategoryRequest
+from .models import ProductRequest
 from django.conf import settings
 
 
@@ -43,23 +43,4 @@ class ProductRequestReviewSerializer(serializers.ModelSerializer):
         fields = ['status', 'admin_comment']
 
 
-class CategoryRequestSerializer(serializers.ModelSerializer):
-    user_username = serializers.CharField(source='user.username', read_only=True)
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
-    
-    class Meta:
-        model = CategoryRequest
-        fields = ['id', 'user', 'user_username', 'name', 'status', 'status_display', 'admin_comment', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'user', 'status', 'admin_comment', 'created_at', 'updated_at']
 
-
-class CategoryRequestCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CategoryRequest
-        fields = ['name']
-
-
-class CategoryRequestReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CategoryRequest
-        fields = ['status', 'admin_comment']
