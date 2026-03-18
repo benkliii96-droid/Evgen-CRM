@@ -202,7 +202,7 @@ export function AdminProducts() {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white">{product.quantity} {product.unit}</td>
+                  <td className="px-4 py-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white">{product.quantity} {product.unit_display}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <button

@@ -485,7 +485,7 @@ export function ProductDetail() {
                   Количество
                 </p>
                 <p className="font-['Inter'] font-semibold text-[18px] text-[#25213b] dark:text-white">
-                  {product.quantity} {product.unit}
+                  {product.quantity} {product.unit_display}
                 </p>
               </div>
               <div className="bg-[#f8f7ff] dark:bg-[#2d2847] rounded-xl p-4">

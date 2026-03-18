@@ -324,7 +324,7 @@ const [unreadCount, setUnreadCount] = useState(0);
                     )}
                   </div>
                   <p className="font-['Inter'] text-[13px] text-[#6e6893] dark:text-[#b8b3d4]">
-                    В наличии: {product.quantity} {product.unit}
+                    В наличии: {product.quantity} {product.unit_display}
                   </p>
                 </div>
               </Link>
