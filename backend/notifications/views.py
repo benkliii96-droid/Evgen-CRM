@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .models import Notification
 from .serializers import NotificationSerializer
 from users.authentication import TokenAuthentication
-from requests.models import CategoryRequest
+# from requests.models import CategoryRequest
 from requests.models import ProductRequest
 
 
@@ -67,10 +67,10 @@ class NotificationViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Нет прав'}, status=status.HTTP_403_FORBIDDEN)
         
         product_count = ProductRequest.objects.filter(status='pending').count()
-        category_count = CategoryRequest.objects.filter(status='pending').count()
+        # category_count = CategoryRequest.objects.filter(status='pending').count()
         
         return Response({
             'product_requests': product_count,
-            'category_requests': category_count,
-            'total': product_count + category_count
+            # 'category_requests': category_count,
+            'total': product_count
         })
