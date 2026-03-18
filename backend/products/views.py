@@ -39,13 +39,18 @@ class UnitViewSet(viewsets.ModelViewSet):
     """ViewSet для единиц измерения"""
     queryset = Unit.objects.all()
     serializer_class = UnitSerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
+    authentication_classes = []  # Без аутентификации для чтения
+    permission_classes = [permissions.AllowAny]  # Разрешить всем
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'short_name']
     ordering_fields = ['sort_order', 'name']
     ordering = ['sort_order', 'name']
     
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAdminUser()]
+        return super().get_permissions()
+
     def get_serializer_class(self):
         if self.action == 'list':
             return UnitListSerializer

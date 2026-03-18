@@ -11,12 +11,12 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
   const isAdmin = user?.is_admin || user?.role === 'admin';
 
   useEffect(() => {
-    if (isAdmin) {
+    if (isAdmin && user) {
       fetchPendingCount();
       const interval = setInterval(fetchPendingCount, 30000);
       return () => clearInterval(interval);
     }
-  }, [isAdmin]);
+  }, [isAdmin, user]);
 
   const fetchPendingCount = async () => {
     const token = localStorage.getItem('token');
@@ -94,7 +94,11 @@ export function AdminLayout({ user, onLogout, darkMode, setDarkMode, children })
               <span className="font-['Inter'] text-[14px]">{user?.username}</span>
             </Link>
             <button
-              onClick={onLogout}
+              onClick={() => {
+                onLogout();
+                // Принудительная перезагрузка для полного сброса состояния
+                window.location.href = '/';
+              }}
               className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#6e6893] dark:text-[#b8b3d4] hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d] transition-colors"
               title="Выйти"
             >

@@ -20,7 +20,12 @@ export function AdminProducts() {
 
   const fetchData = async () => {
     const token = localStorage.getItem('token');
-    console.log('AdminProducts: fetchData started');
+    console.log('AdminProducts: fetchData started, token:', token ? 'exists' : 'MISSING');
+    if (!token) {
+      console.error('AdminProducts: No token found!');
+      setLoading(false);
+      return;
+    }
     try {
       const [productsRes, categoriesRes] = await Promise.all([
         fetch(`${API_URL}/api/products/`, { headers: { 'Authorization': `Token ${token}` } }),

@@ -51,8 +51,9 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
     }
 
     setUnitsLoading(true);
+    const token = localStorage.getItem('token');
     fetch(`${API_URL}/api/units/by_category/?category_id=${categoryId}`, {
-      headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
+      headers: token ? { 'Authorization': `Token ${token}` } : {}
     })
       .then(res => res.json())
       .then(data => {
