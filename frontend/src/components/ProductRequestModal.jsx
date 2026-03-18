@@ -15,6 +15,7 @@ export function ProductRequestModal({ onClose, onError }) {
     discountPercent: 0,
     description: ''
   });
+  
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);

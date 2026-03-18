@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .models import Notification
 from .serializers import NotificationSerializer
 from users.authentication import TokenAuthentication
-from requests.models import ProductRequest
+from requests.models import ProductRequest, CategoryRequest
 
 
 class NotificationViewSet(viewsets.ModelViewSet):

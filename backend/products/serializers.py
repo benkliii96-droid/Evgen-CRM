@@ -275,6 +275,22 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at']
 
+    def get_user_avatar(self, obj):
+        if obj.user and obj.user.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.user.avatar.url)
+            return f'https://csmevg.ru{obj.user.avatar.url}'
+        return None
+
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return f'https://csmevg.ru{obj.image.url}'
+        return None
+
 
 class ProductCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания товара с полями"""
