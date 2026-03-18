@@ -230,8 +230,7 @@ class ProductFieldViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = []  # Без аутентификации для чтения
-    permission_classes = [permissions.AllowAny]  # Разрешить всем
+    permission_classes = [permissions.AllowAny]  # По умолчанию разрешено всем
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'has_discount']
     search_fields = ['name', 'category__name']
@@ -240,7 +239,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsAdminUser()]
+            return [permissions.IsAdminUser()]  # Для изменений — только админ
         return super().get_permissions()
     
     def get_serializer_class(self):
