@@ -172,7 +172,7 @@ export function ProductModal({ product, categories, onClose, onSave, onError }) 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Наименование */}
             <div>
-              <label className="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
+              <label claessName="block font-['Inter'] font-medium text-sm text-[#6e6893] dark:text-[#b8b3d4] mb-2">
                 Наименование *
               </label>
               <input

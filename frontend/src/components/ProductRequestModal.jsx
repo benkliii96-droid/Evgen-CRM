@@ -117,24 +117,28 @@ export function ProductRequestModal({ onClose, onError }) {
       const selectedUnit = availableUnits.find(u => u.id == formData.unit);
       const unitShortName = selectedUnit?.short_name || 'шт';
       
-      const data = {
-        name: formData.name.trim(),
-        category: parseInt(formData.category),
-        unit: unitShortName,
-        quantity: parseInt(formData.quantity),
-        price: parseFloat(formData.price),
-        has_discount: formData.hasDiscount,
-        discount_percent: parseInt(formData.discountPercent),
-        description: formData.description.trim()
-      };
+      // Создаём FormData для отправки с изображением
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name.trim());
+      formDataToSend.append('category', parseInt(formData.category));
+      formDataToSend.append('unit', unitShortName);
+      formDataToSend.append('quantity', parseInt(formData.quantity));
+      formDataToSend.append('price', parseFloat(formData.price));
+      formDataToSend.append('has_discount', formData.hasDiscount ? 'true' : 'false');
+      formDataToSend.append('discount_percent', parseInt(formData.discountPercent));
+      formDataToSend.append('description', formData.description.trim() || '');
+      
+      // Добавляем изображение если есть
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
 
       const res = await fetch(`${API_URL}/api/requests/products/`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
           'Authorization': `Token ${token}`
         },
-        body: JSON.stringify(data)
+        body: formDataToSend
       });
       
       console.log('Response status:', res.status);
