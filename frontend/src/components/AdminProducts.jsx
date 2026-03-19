@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ProductModal } from './ProductModal';
 import { ErrorModal } from './ErrorModal';
-import { ImageModal } from './ImageModal';
 import { ConfirmModal } from './ConfirmModal';
 
 const API_URL = '';
@@ -12,10 +11,8 @@ export function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showError, setShowError] = useState(false);
-  const [showImage, setShowImage] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
-  const [selectedImage, setSelectedImage] = useState('');
   const [deletingId, setDeletingId] = useState(null);
 
   const fetchData = async () => {
@@ -151,8 +148,12 @@ export function AdminProducts() {
 
   const handleImageClick = (image) => {
     if (image) {
-      setSelectedImage(image);
-      setShowImage(true);
+      // Открыть новое окно по центру экрана 600x600
+      const width = 600;
+      const height = 600;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
+      window.open(image, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
     }
   };
 
@@ -209,26 +210,31 @@ export function AdminProducts() {
                   </td>
                   <td className="px-4 py-3 font-['Inter'] text-[14px] text-[#25213b] dark:text-white">{product.quantity} {product.unit_display}</td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       <button
                         onClick={() => { setEditProduct(product); setShowModal(true); }}
-                        className="text-[#6d5bd0] hover:underline font-['Inter'] text-[14px]"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860] transition-colors"
+                        title="Редактировать"
                       >
-                        Ред.
+                        <img src="/edit.svg" alt="Ред." className="w-4 h-4" />
                       </button>
-                      {product.image && (
-                        <button
-                          onClick={() => handleImageClick(product.image)}
-                          className="text-[#6e6893] hover:text-[#6d5bd0] font-['Inter'] text-[14px]"
-                        >
-                          Фото
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleImageClick(product.image)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#f4f2ff] dark:hover:bg-[#3d3860] transition-colors"
+                        title={product.image ? "Просмотр фото" : "Нет фото"}
+                      >
+                        <img 
+                          src={product.image ? "/has_image.svg" : "/nothas_image.svg"} 
+                          alt="Фото" 
+                          className="w-4 h-4" 
+                        />
+                      </button>
                       <button
                         onClick={() => handleDeleteClick(product.id)}
-                        className="text-red-500 hover:underline font-['Inter'] text-[14px]"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#fee2e2] dark:hover:bg-[#4a2d2d] transition-colors"
+                        title="Удалить"
                       >
-                        Удалить
+                        <img src="/delete.svg" alt="Удалить" className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -251,10 +257,6 @@ export function AdminProducts() {
 
       {showError && (
         <ErrorModal onClose={() => setShowError(false)} />
-      )}
-
-      {showImage && (
-        <ImageModal image={selectedImage} onClose={() => setShowImage(false)} />
       )}
 
       {showConfirm && (
