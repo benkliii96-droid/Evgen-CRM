@@ -353,40 +353,56 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         converted = {}
         for key, value in data.items():
             if key == 'hasDiscount':
-                converted['has_discount'] = value.lower() in ('true', '1', 'yes')
+                # Может прийти как boolean (JSON) или как строка (FormData)
+                if isinstance(value, bool):
+                    converted['has_discount'] = value
+                else:
+                    converted['has_discount'] = str(value).lower() in ('true', '1', 'yes')
             elif key == 'category':
                 try:
                     converted['category'] = int(value)
                 except (ValueError, TypeError):
                     converted['category'] = value
             elif key == 'quantity':
-                try:
-                    converted['quantity'] = int(value)
-                except (ValueError, TypeError):
-                    converted['quantity'] = 0
+                if isinstance(value, int):
+                    converted['quantity'] = value
+                else:
+                    try:
+                        converted['quantity'] = int(value)
+                    except (ValueError, TypeError):
+                        converted['quantity'] = 0
             elif key == 'discountPercent':
-                try:
-                    converted['discount_percent'] = int(value)
-                except (ValueError, TypeError):
-                    converted['discount_percent'] = 0
+                if isinstance(value, int):
+                    converted['discount_percent'] = value
+                else:
+                    try:
+                        converted['discount_percent'] = int(value)
+                    except (ValueError, TypeError):
+                        converted['discount_percent'] = 0
             elif key == 'price':
-                try:
+                if isinstance(value, (int, float)):
                     converted['price'] = float(value)
-                except (ValueError, TypeError):
-                    converted['price'] = 0.0
+                else:
+                    try:
+                        converted['price'] = float(value)
+                    except (ValueError, TypeError):
+                        converted['price'] = 0.0
             elif key == 'unit':
                 # Если передан ID юнита - используем его, иначе ищем по short_name
                 if value:
-                    try:
-                        unit_id = int(value)
-                        converted['unit'] = unit_id
-                    except (ValueError, TypeError):
-                        # Это строка (short_name), нужно найти Unit
-                        from .models import Unit
-                        unit_obj = Unit.objects.filter(short_name=value, is_active=True).first()
-                        if unit_obj:
-                            converted['unit'] = unit_obj.id
-                        # Если не найден - не добавляем (оставим null)
+                    if isinstance(value, int):
+                        converted['unit'] = value
+                    else:
+                        try:
+                            unit_id = int(value)
+                            converted['unit'] = unit_id
+                        except (ValueError, TypeError):
+                            # Это строка (short_name), нужно найти Unit
+                            from .models import Unit
+                            unit_obj = Unit.objects.filter(short_name=value, is_active=True).first()
+                            if unit_obj:
+                                converted['unit'] = unit_obj.id
+                            # Если не найден - не добавляем (оставим null)
             elif key == 'name':
                 converted['name'] = value.strip()
             elif key == 'description':
