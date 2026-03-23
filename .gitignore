@@ -9,9 +9,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-*.sqlite3
-db.sqlite3
-*.sqlite3-journal
 
 # Django
 *.log
@@ -35,8 +32,6 @@ backend/.env
 backend/.env.*
 backend/staticfiles/
 backend/media/
-backend/db.sqlite3
-backend/*.sqlite3
 
 # IDE
 .vscode/

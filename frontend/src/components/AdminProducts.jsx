@@ -146,16 +146,16 @@ export function AdminProducts() {
     }
   };
 
-  const handleImageClick = (image) => {
-    if (image) {
-      // Открыть новое окно по центру экрана 600x600
-      const width = 600;
-      const height = 600;
-      const left = (window.screen.width - width) / 2;
-      const top = (window.screen.height - height) / 2;
-      window.open(image, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
-    }
-  };
+ const handleImageClick = (image) => {
+ if (image) {
+ // Открыть новое окно по центру экрана600x600 без элементов управления
+ const width =600;
+ const height =600;
+ const left = (window.screen.width - width) /2;
+ const top = (window.screen.height - height) /2;
+ window.open(image, '_blank', `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,status=no,menubar=no,scrollbars=no`);
+ }
+ };
 
   if (loading) {
     return <div className="font-['Inter'] text-[#6e6893]">Загрузка...</div>;
